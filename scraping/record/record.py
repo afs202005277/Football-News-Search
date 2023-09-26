@@ -40,7 +40,7 @@ def fetch_timestamp(timestamp):
         RecordParser1(timestamp, resp.text, db, log, DEBUG)
     elif year >= 2016:
         RecordParser2(timestamp, resp.text, db, log, DEBUG)
-    elif year >= 2010:
+    elif year >= 2011:
         RecordParser3(timestamp, resp.text, db, log, DEBUG)
     """
     elif year >= x:
@@ -48,16 +48,16 @@ def fetch_timestamp(timestamp):
     ...
     """
 
-print('Scrapping [RECORD] started.')
+print('Scrapping [RECORD.PT] started.')
 
 for timestamp in fetch_timestamps(TIMESTAMPS_URL):
-    """
     # For now, only these works >= 2019
     if timestamp[:4] >= '2019':
         fetch_timestamp(timestamp)
     """
-    if timestamp[:4] < '2016' and timestamp[:4] >= '2010':
+    if timestamp[:4] >= '2016' and timestamp[:4] < '2019':
         fetch_timestamp(timestamp)
+    """
 
-print('Scrapping [RECORD] ended.')
+print('Scrapping [RECORD.PT] ended.')
 db.close()

@@ -5,10 +5,6 @@
 from bs4 import BeautifulSoup
 import requests
 
-LIGA_NOS_NEWS = 'https://www.record.pt/futebol/futebol-nacional/liga-nos.html'
-SEGUNDA_LIGA_NEWS = 'https://www.record.pt/futebol/futebol-nacional/2--liga.html'
-TACA_PORTUGAL_NEWS = 'https://www.record.pt/futebol/futebol-nacional/taca-de-portugal.html'
-
 class RecordParser2():
     def __init__(self, timestamp, html, db, log, debug):
         self.debug = debug
@@ -23,7 +19,7 @@ class RecordParser2():
 
         news_counter = 0
 
-        resp = requests.get(f'https://arquivo.pt{section}')
+        resp = requests.get(f'https://arquivo.pt{section["href"]}')
         soup = BeautifulSoup(resp.text, features='lxml')
         
         news = soup.select('div.record-thumb .thumb-info a')
@@ -56,8 +52,13 @@ class RecordParser2():
         return news_counter
 
     def fetch_news(self):
+        soup = BeautifulSoup(self.html, features='lxml')
+        sections = soup.select('.l1 .futebol a')
+
+        if self.debug: print(f'SECTIONS FOUND: {",".join(map(lambda s : s.text, sections))}')
+    
         news_counter = 0
-        for section in [LIGA_NOS_NEWS, SEGUNDA_LIGA_NEWS, TACA_PORTUGAL_NEWS]:
-            news_counter += self.fetch_section(f'/wayback/{self.timestamp}/' + section)
+        for section in sections:
+            news_counter += self.fetch_section(section)
         if news_counter == 0: self.log.error(f'Didn\'t found any new on timestamp {self.timestamp}, analyze this year.')
         print(f'Found {news_counter} news on {self.timestamp}')

@@ -1,5 +1,5 @@
 ##########################################
-# PARSER FOR YEARS 2010-2015
+# PARSER FOR YEARS 2011-2015
 ##########################################
 
 from bs4 import BeautifulSoup
@@ -12,19 +12,26 @@ class RecordParser3():
         self.html = html
         self.db = db
         self.log = log
+        self.club_sections = []
+        self.fetch_club_sections()
         self.fetch_news()
+
+    def fetch_club_sections(self):
+        resp = requests.get(f'https://arquivo.pt/noFrame/replay/{self.timestamp}/http://www.record.xl.pt/')
+        soup = BeautifulSoup(resp.text, features='lxml')
+
+        for a in soup.select('.listaBrazoes a'):
+            self.club_sections.append(a['href'][30:])
 
     def fetch_section(self, section):
         if self.debug: print(f'\n==> HANDLE SECTION - {section}\n')
 
         news_counter = 0
 
-        resp = requests.get(f'https://arquivo.pt{section}')
+        resp = requests.get(f'https://arquivo.pt/noFrame/replay/{self.timestamp}{section}')
         soup = BeautifulSoup(resp.text, features='lxml')
         
         news = soup.select('div.caixaModNot a.linkUnd')
-        print(resp.text)
-        return
         for new in news:
             if self.debug: print(f'= FOUND NEW - {new.text}')
 
@@ -54,6 +61,8 @@ class RecordParser3():
         return news_counter
 
     def fetch_news(self):
-        news_counter = self.fetch_section(f'/wayback/{self.timestamp}/http://www.record.xl.pt/futebol/default.aspx')
+        news_counter = 0
+        for section in self.club_sections + ['/http://www.record.xl.pt/futebol/default.aspx']:
+            self.fetch_section(section)
         if news_counter == 0: self.log.error(f'Didn\'t found any new on timestamp {self.timestamp}, analyze this year.')
         print(f'Found {news_counter} news on {self.timestamp}')
