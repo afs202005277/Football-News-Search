@@ -1,3 +1,4 @@
 slides/
 .*
 venv/
+__pycache__
