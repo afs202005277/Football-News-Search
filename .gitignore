@@ -1,3 +1,2 @@
-slides/
-.*
-venv/
+tutorials-main/
+.idea/
