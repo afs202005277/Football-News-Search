@@ -2,3 +2,5 @@ slides/
 .*
 venv/
 __pycache__
+tutorials-main/
+.idea/
