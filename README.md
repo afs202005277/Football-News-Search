@@ -2,7 +2,7 @@
 
 ## Theme
 
-TODO: ...
+The idea is to create a soccer news retrieval system. We want to create game reports based on games description and gather information, using (arquivo.pt)[https://arquivo.pt/], to create news.
 
 
 ## Team
