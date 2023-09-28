@@ -1,7 +1,3 @@
-##########################################
-# PARSER FOR YEARS 2019-2022
-##########################################
-
 from bs4 import BeautifulSoup
 import requests
 
