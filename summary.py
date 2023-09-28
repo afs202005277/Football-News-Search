@@ -1,32 +1,65 @@
-import openai
-import os
-from dotenv import load_dotenv
 import csv
+import random
+import expressions
 
-load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 file_name = "full_data.csv"
 
-out = "data_with_summary.csv"
-
 encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1']
 
-def createPrompt(home, away, comment):
+def summarize(game):
+    home, away, events, date, hour, winner = game
 
-    res = ""
+    home_winning_start, away_winning_start, draw_start = expressions.createStartExpressions(home, away)
 
-    res += "Based on the provided commentary of a soccer game, can you create a paragraph or two to summarize what happened?\n"
+    text = ""
 
-    res += f"It is a \"Liga Portugal\" game, {home} (Home) vs. {away} (Away).\n"
+    if winner == "home":
+        text += home_winning_start[random.randint(0, 4)] + " Resumo do Jogo: "
+    elif winner == "away":
+        text += away_winning_start[random.randint(0, 4)] + " Resumo do Jogo: "
+    elif winner == "draw":
+        text += draw_start[random.randint(0, 4)] + " Resumo do Jogo: "
 
-    res += "Conclude your text with the full-time result.\n"
+    for event in events:
+        if event == '': continue
+        try:
+            temp, name = event.split(' - ')
+            if '(' in name:
+                name = name.split('(')[0]
+            minute, eve = temp.split('\' ')
+            minute = minute[:len(minute) - 1]
+            eve = eve.lower()
+        except:
+            continue
 
-    res += "Commentary:\n"
+        goal_home_eve, goal_away_eve, own_goal_home_eve, own_goal_away_eve, yellow_card_eve, red_card_eve, penalty_missed_home_eve, penalty_missed_away_eve = expressions.createExpressions(home, away, minute, name)
 
-    res += str(comment)
-    return res
+        if eve == 'goal_home':
+            text += goal_home_eve[random.randint(0, 4)] + " "
+        elif eve == 'goal_away':
+            text += goal_away_eve[random.randint(0, 4)] + " "
+        elif 'yellow' in eve:
+            text += yellow_card_eve[random.randint(0, 4)] + " "
+        elif 'red' in eve:
+            text += red_card_eve[random.randint(0, 4)] + " "
+        elif eve == 'own_home':
+            text += own_goal_home_eve[random.randint(0, 4)] + " "
+        elif eve == 'own_away':
+            text += own_goal_away_eve[random.randint(0, 4)] + " "
+        elif eve == 'penalty_missed_home':
+            text += penalty_missed_home_eve[random.randint(0, 4)] + " "
+        elif eve == 'penalty_missed_away':
+            text += penalty_missed_away_eve[random.randint(0, 4)] + " "
+
+    return text
+
+
+
+
+
+
+
 
 for encoding in encodings_to_try:
     try:
@@ -45,28 +78,20 @@ for encoding in encodings_to_try:
             commentary = parsed_line[3]
             date = parsed_line[5]
             hour = parsed_line[6]
+            winner = parsed_line[11].lower()
             commentaryFormated = commentary[1:len(commentary) - 1].replace(", ", ",").replace("\"", "").split(',')
             data = commentaryFormated if commentary != "" else []
-            info.append([home, away, data, date, hour])
+            info.append([home, away, data, date, hour, winner])
 
         break  # Exit the loop if successful
     except UnicodeDecodeError:
         continue  # Try the next encoding if decoding fails
+with open('game_reports.csv', 'w', newline='', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    for game in info:
+        text = summarize(game)
+        writer.writerow([game[0], game[1], game[5], game[3], game[4], text])
 
-for game in info[0:1]:
-    prompt = createPrompt(game[0], game[1], game[2])
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role":"user", "content": prompt}]
-    )
-
-    english_text = response.choices[0].message.content
-
-    #Translation Here
-    portuguese_text = english_text
-
-    with open(f'{game[0]}-{game[1]}-{game[3].replace(".", "-")}-{game[4].replace(":", "-")}.txt', 'w') as file:
-        file.write(portuguese_text)
 
 
 
