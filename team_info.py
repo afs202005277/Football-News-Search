@@ -1,4 +1,9 @@
 import csv
+import sys
+
+sys.path.append('./scraping/db')
+
+from db import DB
 
 file_name = 'game_reports.csv'
 
@@ -160,3 +165,10 @@ Ao longo da sua existência, várias figuras marcaram a história do clube, com 
 }
 
 print(len(info))
+
+db = DB()
+
+for team in info:
+    db.insert_new_wiki((team, info[team]))
+
+db.close()
