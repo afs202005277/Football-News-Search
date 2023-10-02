@@ -4,6 +4,7 @@ import os
 SCHEMA = '../db/schema.sql'
 DB_PATH = '../db/db.sqlite'
 
+
 class DB:
     def __init__(self):
         # Run schema if db doesn't exists
