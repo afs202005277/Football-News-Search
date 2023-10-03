@@ -1,7 +1,9 @@
+import sqlite3
 from datetime import timedelta
 from bs4 import BeautifulSoup
 from scraping.utils import *
 from scraping.RateLimitedRequest import RateLimitedRequest
+from scraping.db.db import DB
 
 
 def has_no_seta_id(tag):
@@ -84,7 +86,7 @@ class ABolaScrapper:
                 body = "\n".join(body)
                 date = soup.find('td', {'class': 'dk'}).text
                 final += {'title': title, 'body': body, 'date': date}
-            elif len(soup.find('body').children) == 1 and soup.find('body').children[0].name == 'img':
+            elif len(list(soup.find('body').children)) == 1 and list(soup.find('body').children)[0].name == 'img':
                 print('Found single image. Ignoring...')
             else:
                 print("Unknown HTML: " + url)
@@ -107,6 +109,8 @@ class ABolaScrapper:
                     for idx, json_object in enumerate(json_data['response_items']):
                         self.all_data += self.parse_text(json_object['linkToNoFrame'])
                         print(len(self.all_data))
+                        if len(self.all_data) > 20:
+                            return self.all_data
                     if len(json_data['response_items']) == 0:
                         break
                     self.params['offset'] = str(
@@ -117,6 +121,14 @@ class ABolaScrapper:
             self.params['to'] = (start_date + one_month).strftime("%Y%m%d%H%M%S")
 
         return self.all_data
+
+    def save_to_db(self, db):
+        for document in self.all_data:
+            try:
+                db.insert_new((document['title'], document['body'], document['date'][:10]))
+            except sqlite3.IntegrityError as e:
+                continue
+        print("Finished saving. Current size of table: " + str(db.count_rows()))
 
 
 def main(url=None):
@@ -140,10 +152,11 @@ def main(url=None):
     else:
         all_data = scrapper.fetch_all()
     print("Retrieved " + str(len(all_data)) + " data items!")
+    scrapper.save_to_db(DB())
 
 
 if __name__ == "__main__":
-    main('https://arquivo.pt/noFrame/replay/20081021102847/http://abola.pt/graficos_div/grafico.aspx')
+    main()
 # url = 'https://arquivo.pt/noFrame/replay/20081021111623/http://abola.pt/nnh/ver.aspx?id=150881'
 # print(parse_text(url))
 # 2194

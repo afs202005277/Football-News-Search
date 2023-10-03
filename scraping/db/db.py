@@ -32,13 +32,18 @@ class DB:
         print('Database initialized.')
 
     def insert_new(self, data):
-        self.instance.execute('INSERT INTO new(title, content) VALUES(?, ?)', data)
+        self.instance.execute('INSERT INTO new(title, content, publish_date) VALUES(?, ?, ?)', data)
         self.instance.commit()
 
     def insert_new_wiki(self, data):
         self.instance.execute('INSERT INTO team_info(name, content) VALUES(?, ?)', data)
         self.instance.commit()
 
+    def count_rows(self):
+        cursor = self.instance.cursor()
+        cursor.execute('SELECT COUNT(*) FROM new')
+        count = cursor.fetchone()[0]
+        return count
 
     def close(self):
         self.instance.close()
