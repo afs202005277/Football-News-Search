@@ -9,6 +9,7 @@ ROOT_DIR = os.path.dirname(
 SCHEMA = f'{ROOT_DIR}/schema.sql'
 DB_PATH = f'{ROOT_DIR}/db.sqlite'
 
+
 class DB:
     def __init__(self):
         # Run schema if db doesn't exists
