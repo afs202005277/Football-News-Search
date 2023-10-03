@@ -10,11 +10,12 @@ def has_no_seta_id(tag):
 
 class ABolaScrapper:
 
-    def __init__(self, params, limited_requester):
+    def __init__(self, params, limited_requester, black_list):
         self.params = params
         self.target_text = ""
         self.all_data = []
         self.requester = limited_requester
+        self.black_list = black_list
 
     def contains_text(self, element):
         return self.target_text in element.get_text()
@@ -27,6 +28,8 @@ class ABolaScrapper:
             if "ver" in href and "icia" in href:
                 href = '?op=ver&noticia=' + href[href.find('icia=') + len('icia='):]
             new_url = url[:url.rfind('?')] + href
+            if any(substring in new_url for substring in self.black_list):
+                continue
             full_page = self.requester.get(new_url)
             full_page_soup = BeautifulSoup(full_page.text, 'html.parser')
             tables = full_page_soup.select('tr > td.dg')
@@ -49,6 +52,8 @@ class ABolaScrapper:
             links = soup.find_all(has_no_seta_id)
             for link in links:
                 new_link = url[:url.rfind('/') + 1] + link.get('href')
+                if any(substring in new_link for substring in self.black_list):
+                    continue
                 response = self.requester.get(new_link)
                 response.raise_for_status()
                 soup = BeautifulSoup(response.text, 'html.parser')
@@ -59,6 +64,8 @@ class ABolaScrapper:
         final = []
         try:
             # Send a GET request to the URL
+            if any(substring in url for substring in self.black_list):
+                return final
             response = self.requester.get(url)
             response.raise_for_status()  # Raise an exception if the request was not successful
 
@@ -77,6 +84,8 @@ class ABolaScrapper:
                 body = "\n".join(body)
                 date = soup.find('td', {'class': 'dk'}).text
                 final += {'title': title, 'body': body, 'date': date}
+            elif len(soup.find('body').children) == 1 and soup.find('body').children[0].name == 'img':
+                print('Found single image. Ignoring...')
             else:
                 print("Unknown HTML: " + url)
         except Exception as e:
@@ -123,9 +132,9 @@ def main(url=None):
         'fields': 'linkToNoFrame',
         'offset': '0'
     }
-    black_list = ['votar.aspx', '/videos/']
+    black_list = ['votar.aspx', '/videos/', 'registo.aspx', '.css', '.jpg', 'gif', '.png', '.swf']
     limited_requester = RateLimitedRequest(250)
-    scrapper = ABolaScrapper(request_parameters, limited_requester)
+    scrapper = ABolaScrapper(request_parameters, limited_requester, black_list)
     if url:
         all_data = scrapper.parse_text(url)
     else:
@@ -134,7 +143,7 @@ def main(url=None):
 
 
 if __name__ == "__main__":
-    main('https://arquivo.pt/noFrame/replay/20080311162934/http://abola.pt/nnh/print.asp?noticia=137005&tema=15')
+    main('https://arquivo.pt/noFrame/replay/20081021102847/http://abola.pt/graficos_div/grafico.aspx')
 # url = 'https://arquivo.pt/noFrame/replay/20081021111623/http://abola.pt/nnh/ver.aspx?id=150881'
 # print(parse_text(url))
 # 2194
