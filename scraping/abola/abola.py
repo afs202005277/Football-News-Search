@@ -109,8 +109,6 @@ class ABolaScrapper:
                     for idx, json_object in enumerate(json_data['response_items']):
                         self.all_data += self.parse_text(json_object['linkToNoFrame'])
                         print(len(self.all_data))
-                        if len(self.all_data) > 20:
-                            return self.all_data
                     if len(json_data['response_items']) == 0:
                         break
                     self.params['offset'] = str(
@@ -119,6 +117,7 @@ class ABolaScrapper:
             start_date += one_month
             self.params['from'] = start_date.strftime("%Y%m%d%H%M%S")
             self.params['to'] = (start_date + one_month).strftime("%Y%m%d%H%M%S")
+            self.params['offset'] = "0"
 
         return self.all_data
 
