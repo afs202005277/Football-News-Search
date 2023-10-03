@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import timedelta
 
 from scraping.RateLimitedRequest import RateLimitedRequest
@@ -17,7 +18,10 @@ def parser1(soup):
     if title_element.select_one('span.ojpremium'):
         text_list[0] = text_list[0][len("Premium "):]
     for child in soup.find('div', {'class': 't-a-c-wrap js-select-and-share-1'}).find_all(recursive=False):
-        if child.has_attr('role') and child['role'] == 'complementary':
+        if (child.has_attr('role') and child['role'] == 'complementary') or (
+                child.has_attr('class') and any('pub-box' in fc for fc in child.get('class'))) or (
+                child.has_attr('class') and
+                child.name == 'div' and any('footer' in fc for fc in child.get('class'))):
             continue
         text = child.get_text(strip=True)
         text_list.append(text)
@@ -49,8 +53,8 @@ def parse_text(limit_request, url):
             date = tmp[0].get_text(strip=True)
             res.append((title, body, date))
         elif soup.find('div', {'class': 't-g1-list-1'}).find('div').find_all('article'):
-            articles = soup.find('div', {'class': 't-g1-list-1'}).find('div').find_all('article')
-            links = list(map(lambda x: x.find('h2').find('a').get('href'), articles))
+            links = list(map(lambda x: x.find('h2').find('a').get('href'),
+                             soup.find('div', {'class': 't-g1-list-1'}).find('div').find_all('article')))
             for link in links:
                 full_link = "https://arquivo.pt" + link
                 response = requests.get(full_link)
@@ -64,8 +68,8 @@ def parse_text(limit_request, url):
 
 
 def fetch_all(request_params):
-    blacklist = ['.gif', '.jpg', 'estatisticas.asp', 'resultados.asp', '.txt', 'apps-rss', 'termos-uso', '/sugestoes/', 'pesquisa.html', 'resultados.html', 'classificacoes.html']
-    database = DB()
+    blacklist = ['.gif', '.jpg', 'estatisticas.asp', 'resultados.asp', '.txt', 'apps-rss', 'termos-uso', '/sugestoes/',
+                 'pesquisa.html', 'resultados.html', 'classificacoes.html', 'multimedia/videos']
     used_links = set()
     files = []
     final_url = ""
@@ -75,6 +79,8 @@ def fetch_all(request_params):
     one_month = timedelta(days=30.44)
     while start_date < current_time:
         print(len(files))
+        if len(files) >= 1:
+            break
         try:
             final_url = build_api_request(request_params)
             response = limit_request.get(final_url)
@@ -103,14 +109,14 @@ def fetch_all(request_params):
 
         except requests.exceptions.RequestException as e:
             logging.error(f"Error fetching URL '{final_url}': {e}")
-    database.close()
+    return files
 
 
 def main(url=None):
     request_parameters = {
         'q': '',
-        'from': '20180311071754',
-        'to': '20180410175130',
+        'from': '20000609140106',
+        'to': '20000709140106',
         'siteSearch': 'ojogo.pt',
         'maxItems': '2000',
         'prettyPrint': 'false',
@@ -122,7 +128,15 @@ def main(url=None):
         print(var)
         print(len(var))
     else:
-        fetch_all(request_parameters)
+        documents = fetch_all(request_parameters)
+        db = DB()
+        for (title, body, date) in documents:
+            try:
+                db.insert_new((title, body, convert_to_uniform_date(date)))
+            except sqlite3.IntegrityError as e:
+                continue
+        db.close()
 
 
-main()
+main(
+    'https://arquivo.pt/noFrame/replay/20190831083848/https://ojogo.pt/futebol/1a-liga/rio-ave/noticias/interior/extremo-do-chelsea-a-caminho-do-rio-ave-avancam-em-italia-11241429.html')
