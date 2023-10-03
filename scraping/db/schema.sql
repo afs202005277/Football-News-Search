@@ -1,9 +1,16 @@
 DROP TABLE IF EXISTS new;
+DROP TABLE IF EXISTS team_info;
 
 CREATE TABLE new(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT UNIQUE NOT NULL,
     content TEXT NOT NULL,
-    timestamp INTEGER NOT NULL,
+    publish_date DATE NOT NULL,
     origin TEXT NOT NULL
+);
+
+CREATE TABLE team_info(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    content TEXT NOT NULL
 );

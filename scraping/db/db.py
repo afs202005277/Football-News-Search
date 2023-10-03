@@ -1,15 +1,21 @@
 import sqlite3
 import os
 
-SCHEMA = '../db/schema.sql'
-DB_PATH = '../db/db.sqlite'
+import os
+
+ROOT_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+SCHEMA = f'{ROOT_DIR}/schema.sql'
+DB_PATH = f'{ROOT_DIR}/db.sqlite'
+
 
 class DB:
     def __init__(self):
         # Run schema if db doesn't exists
         run_schema = not os.path.exists(DB_PATH)
 
-        # Create or open databas
+        # Create or open database
         self.instance = sqlite3.connect(DB_PATH)
         cursor = self.instance.cursor()
 
@@ -26,8 +32,18 @@ class DB:
         print('Database initialized.')
 
     def insert_new(self, data):
-        self.instance.execute('INSERT INTO new(title, content, timestamp, origin) VALUES(?, ?, ?, ?)', data)
+        self.instance.execute('INSERT INTO new(title, content, publish_date, origin) VALUES(?, ?, ?, ?)', data)
         self.instance.commit()
+
+    def insert_new_wiki(self, data):
+        self.instance.execute('INSERT INTO team_info(name, content) VALUES(?, ?)', data)
+        self.instance.commit()
+
+    def count_rows(self):
+        cursor = self.instance.cursor()
+        cursor.execute('SELECT COUNT(*) FROM new')
+        count = cursor.fetchone()[0]
+        return count
 
     def close(self):
         self.instance.close()

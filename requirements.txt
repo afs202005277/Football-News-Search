@@ -1,0 +1,7 @@
+csv
+random
+expressions
+logging
+bs4 
+requests
+re
