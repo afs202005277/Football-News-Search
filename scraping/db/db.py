@@ -26,7 +26,7 @@ class DB:
         print('Database initialized.')
 
     def insert_new(self, data):
-        self.instance.execute('INSERT INTO new(title, content) VALUES(?, ?)', data)
+        self.instance.execute('INSERT INTO new(title, content, timestamp, origin) VALUES(?, ?, ?, ?)', data)
         self.instance.commit()
 
     def close(self):

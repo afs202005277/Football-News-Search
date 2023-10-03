@@ -1,3 +1,4 @@
-ERROR - Failed to get content on new - 20110614150152 - Sócios aprovam aumentode 12 euros nas quotas anuais 
-ERROR - Failed to get content on new - 20110614150152 - Limpeza de quadrospaga as renovações
-ERROR - Failed to get content on new - 20110614150152 - Legião na Argentinapara honrar o capitão
+WARNING - Failed to fecth new page - 20220101180358 - Notícia Record: Pizzi, Yaremchuk e Radonjic infetados 
+WARNING - Failed to fecth new page - 20220101180358 - Sporting bate Benfica na Luz e reforça liderança do campeonato
+ERROR - Failed to insert into in the database, maybe duplicated - Incorrect number of bindings supplied. The current statement uses 2, and there are 4 supplied.
+ERROR - Failed to insert into in the database, maybe duplicated - Incorrect number of bindings supplied. The current statement uses 2, and there are 4 supplied.

@@ -3,5 +3,7 @@ DROP TABLE IF EXISTS new;
 CREATE TABLE new(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT UNIQUE NOT NULL,
-    content TEXT NOT NULL
+    content TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    origin TEXT NOT NULL
 );

@@ -21,5 +21,5 @@ class RecordParser1922(Parser):
         return ''.join(t.find_all(string=True, recursive=False)).rstrip().lstrip().replace('\n', '')
     
     def __sections_selector__(self):
-        sections = BeautifulSoup(self.html, features='lxml').select('.icons_menu.futebol a')
-        return list(filter(lambda x : x not in self.blacklist, sections))
+        sections = BeautifulSoup(self.html, features='lxml').select('.icons_menu.futebol ul li > a')
+        return list(filter(lambda x : x.text not in self.blacklist, sections))

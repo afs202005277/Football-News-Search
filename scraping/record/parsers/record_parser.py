@@ -20,6 +20,7 @@ class Parser():
         raise NotImplementedError('Abstract Method - Implementation Missing')
 
     def fetch_section(self, section):
+        year = int(self.timestamp[:4])
         if self.debug: print(f'\n==> HANDLE SECTION - {section.text}\n')
 
         news_counter = 0
@@ -31,7 +32,10 @@ class Parser():
             if self.debug: print(f'= FOUND NEW - {new.text}')
 
             try:
-                resp = requests.get(f'https://arquivo.pt{new["href"]}')
+                if 'record' not in new['href']:
+                    resp = requests.get(f'/noFrame/replay/{self.timestamp}/http://www.record.pt/{new["href"]}')
+                else:
+                    resp = requests.get(f'https://arquivo.pt{new["href"]}')
                 soup = BeautifulSoup(resp.text, features='lxml')
 
                 if not resp.ok:
@@ -44,13 +48,13 @@ class Parser():
                     continue    
 
                 try:
-                    self.db.insert_new((new.text, content))
+                    self.db.insert_new((new.text, content, self.timestamp, 'record'))
                 except Exception as e:
                     self.log.error(f'Failed to insert into in the database, maybe duplicated - {e}')
                 finally:
                     news_counter += 1
             except Exception as e:
-                self.log.error(f'Failed to get content on new - {self.timestamp} - {new.text}')
+                self.log.error(f'Failed to get content on new - {self.timestamp} - {new.text} - {e}')
         return news_counter
 
     def fetch_news(self):
