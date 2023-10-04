@@ -69,7 +69,8 @@ def parse_text(limit_request, url):
 
 def fetch_all(request_params):
     blacklist = ['.gif', '.jpg', 'estatisticas.asp', 'resultados.asp', '.txt', 'apps-rss', 'termos-uso', '/sugestoes/',
-                 'pesquisa.html', 'resultados.html', 'classificacoes.html', 'multimedia/videos']
+                 'pesquisa.html', 'resultados.html', 'classificacoes.html', 'multimedia/videos', '/subscricoes',
+                 '/totojogos', 'requests.aspx', 'content-gating', '.ttf', 'ficha-tecnica']
     used_links = set()
     files = []
     final_url = ""
@@ -79,8 +80,6 @@ def fetch_all(request_params):
     one_month = timedelta(days=30.44)
     while start_date < current_time:
         print(len(files))
-        if len(files) >= 1:
-            break
         try:
             final_url = build_api_request(request_params)
             response = limit_request.get(final_url)
@@ -132,11 +131,12 @@ def main(url=None):
         db = DB()
         for (title, body, date) in documents:
             try:
+                if isinstance(body, list):
+                    body = "".join(body)
                 db.insert_new((title, body, convert_to_uniform_date(date)))
             except sqlite3.IntegrityError as e:
                 continue
         db.close()
 
 
-main(
-    'https://arquivo.pt/noFrame/replay/20190831083848/https://ojogo.pt/futebol/1a-liga/rio-ave/noticias/interior/extremo-do-chelsea-a-caminho-do-rio-ave-avancam-em-italia-11241429.html')
+main()
