@@ -5,7 +5,8 @@ CREATE TABLE new(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT UNIQUE NOT NULL,
     content TEXT NOT NULL,
-    publish_date DATE NOT NULL
+    publish_date DATE NOT NULL,
+    origin TEXT NOT NULL
 );
 
 CREATE TABLE team_info(

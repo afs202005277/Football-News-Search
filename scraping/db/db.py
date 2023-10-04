@@ -32,7 +32,7 @@ class DB:
         print('Database initialized.')
 
     def insert_new(self, data):
-        self.instance.execute('INSERT INTO new(title, content, publish_date) VALUES(?, ?, ?)', data)
+        self.instance.execute('INSERT INTO new(title, content, publish_date, origin) VALUES(?, ?, ?, ?)', data)
         self.instance.commit()
 
     def insert_new_wiki(self, data):
