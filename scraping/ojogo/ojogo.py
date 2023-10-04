@@ -133,7 +133,7 @@ def main(url=None):
             try:
                 if isinstance(body, list):
                     body = "".join(body)
-                db.insert_new((title, body, convert_to_uniform_date(date)))
+                db.insert_new((title, body, convert_to_uniform_date(date), 'ojogo'))
             except sqlite3.IntegrityError as e:
                 continue
         db.close()

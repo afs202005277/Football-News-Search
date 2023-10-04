@@ -124,7 +124,7 @@ class ABolaScrapper:
     def save_to_db(self, db):
         for document in self.all_data:
             try:
-                db.insert_new((document['title'], document['body'], convert_to_uniform_date(document['date'])))
+                db.insert_new((document['title'], document['body'], convert_to_uniform_date(document['date']), 'abola'))
             except sqlite3.IntegrityError as e:
                 continue
         print("Finished saving. Current size of table: " + str(db.count_rows()))
