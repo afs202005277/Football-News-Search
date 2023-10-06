@@ -8,6 +8,7 @@ class Parser():
         self.html = html
         self.db = db
         self.log = log
+        self.visited = set()
         self.fetch_news()
 
     def __news_selector__(self, soup):
@@ -31,11 +32,19 @@ class Parser():
         for new in news:
             if self.debug: print(f'= FOUND NEW - {new.text}')
 
+            url = ''
+            if 'record' not in new['href']:
+                url = f'https://arquivo.pt/noFrame/replay/{self.timestamp}/http://www.record.xl.pt/{new["href"]}'
+            elif 'arquivo.pt' in new['href']:
+                url = new['href']
+            else:
+                url = f'https://arquivo.pt{new["href"]}'
+
+            if url in self.visited: continue
+            self.visited.add(url)
+            
             try:
-                if 'record' not in new['href']:
-                    resp = requests.get(f'/noFrame/replay/{self.timestamp}/http://www.record.pt/{new["href"]}')
-                else:
-                    resp = requests.get(f'https://arquivo.pt{new["href"]}')
+                resp = requests.get(url)
                 soup = BeautifulSoup(resp.text, features='lxml')
 
                 if not resp.ok:
