@@ -14,7 +14,7 @@ class RecordParser1618(Parser):
         return soup.select('div.record-thumb .thumb-info a')
 
     def __new_content_selector__(self, soup):
-        return ''.join(soup.select('#readerBody').find_all(string=True, recursive=False)).rstrip().lstrip().replace('\n', '')
+        return ''.join(soup.find(id='readerBody').find_all(string=True, recursive=False)).rstrip().lstrip().replace('\n', '')
     
     def __sections_selector__(self):
         return BeautifulSoup(self.html, features='lxml').select('.l1 .futebol a') 
