@@ -39,11 +39,27 @@ class DB:
         self.instance.execute('INSERT INTO team_info(name, content) VALUES(?, ?)', data)
         self.instance.commit()
 
-    def count_rows(self):
+    def count_rows(self, table_name):
         cursor = self.instance.cursor()
-        cursor.execute('SELECT COUNT(*) FROM new')
+        cursor.execute('SELECT COUNT(*) FROM ' + table_name)
         count = cursor.fetchone()[0]
         return count
+
+    def retrieve_data_distribution(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT publish_date, origin FROM new")
+        return cursor.fetchall()
+
+    def retrieve_text_for_wordcloud(self):
+        cursor = self.instance.cursor()
+        text = ''
+        cursor.execute("SELECT content FROM new")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        cursor.execute("SELECT content FROM team_info")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        cursor.execute("SELECT content FROM game_reports")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        return text
 
     def close(self):
         self.instance.close()
