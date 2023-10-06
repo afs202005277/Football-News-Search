@@ -18,9 +18,6 @@ for line in lines:
     teams.add(parsed_line[0])
     teams.add(parsed_line[1])
 
-print(len(teams))
-print(teams)
-
 info = {
     'Beira Mar' : '''O Sport Clube Beira-Mar é um clube eclético português com sede em Aveiro, nomeado em alusão ao bairro aveirense com o mesmo nome e oficialmente fundado no Réveillon de 1922 para 1923, numa sessão que começou na noite de 31 de Dezembro de 1922 e que culminou no dia seguinte, 1 de Janeiro de 1923, conforme ata de constituição aqui reproduzida.
 Neste clube são praticadas várias modalidades sendo o futebol de onze a mais representativa, mas igualmente outras modalidades como o futsal, basquetebol, judo, boxe, paintball, atletismo, bilhar, Jiu Jitsu, Xadrez e squash. Em 2010, a secção de natação suspendeu a sua atividade e em 2011 o mesmo aconteceu com a secção de triatlo e duatlo. Em todas estas modalidades é desenvolvida formação de jovens. O clube não possui infraestruturas, uma vez que o pavilhão polidesportivo do Alboi (mais tarde demolido), um apartamento foram vendidos em hasta pública, assim como as piscinas e o estádio é propriedade do município de Aveiro.
@@ -163,8 +160,6 @@ O acesso às provas europeias é norma para a equipa vimaranense, tendo já disp
 Pelo clube, passaram alguns dos jogadores mais talentosos que atuaram no futebol português, tais como Damas, Neno, Nuno Espírito Santo, José Carlos, Costeado, Dimas, Fernando Meira, Pedro Geromel, Tapsoba, Quim Berto, Paulo Bento, N´Dinga, Pedro Martins, Zahovic, Capucho, Vítor Paneira, Pedro Mendes, Nuno Assis, André Almeida, Ademir, Roldão, Ricardo Pereira, Raphinha, Hernâni, Marcus Edwards, Ricardo Quaresma, Edmur, Paulinho Cascavel, Ziad, Soudani, Tiquinho Soares, entre muitos outros.
 Ao longo da sua existência, várias figuras marcaram a história do clube, com Presidentes como Pimenta Machado e Júlio Mendes a figurar como individualidades marcantes. Ao nível de treinadores, Jorge Vieira, José Maria Pedroto, Raymond Goethlas, António Morais, Marinho Peres, Paulo Autuori, Manuel José, João Alves, Jaime Pacheco, Augusto Inácio, Quinito, Manuel Cajuda, Rui Vitória, Sérgio Conceição e Pedro Martins deixaram a sua marca no clube Vimaranense.'''
 }
-
-print(len(info))
 
 db = DB()
 

@@ -1,6 +1,13 @@
 import csv
 import random
 import expressions
+import csv
+import sys
+
+sys.path.append('./scraping/db')
+
+from db import DB
+
 
 
 file_name = "full_data.csv"
@@ -55,12 +62,6 @@ def summarize(game):
     return text
 
 
-
-
-
-
-
-
 for encoding in encodings_to_try:
     try:
         # Read the contents of the file with the specified encoding
@@ -86,12 +87,14 @@ for encoding in encodings_to_try:
         break  # Exit the loop if successful
     except UnicodeDecodeError:
         continue  # Try the next encoding if decoding fails
-with open('game_reports.csv', 'w', newline='', encoding='utf-8') as file:
-    writer = csv.writer(file)
-    for game in info:
-        text = summarize(game)
-        writer.writerow([game[0], game[1], game[5], game[3], game[4], text])
 
+db = DB()
+
+for game in info:
+    text = summarize(game)
+    db.insert_new_game_report((game[0], game[1], game[5], f"{game[3]} {game[4]}", text))
+
+db.close()
 
 
 

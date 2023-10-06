@@ -39,6 +39,11 @@ class DB:
         self.instance.execute('INSERT INTO team_info(name, content) VALUES(?, ?)', data)
         self.instance.commit()
 
+    def insert_new_game_report(self, data):
+        self.instance.execute('INSERT INTO game_reports(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
+        self.instance.commit()
+
+
     def count_rows(self):
         cursor = self.instance.cursor()
         cursor.execute('SELECT COUNT(*) FROM new')
