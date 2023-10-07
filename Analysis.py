@@ -112,11 +112,55 @@ def create_most_popular_team_plot(db):
     plt.show()
 
 
+def calculate_average_words_per_content(db, tables):
+    total_words = 0
+    total_contents = 0
+    cursor = db.get_cursor()
+    batch_size = 100
+    offset = 0
+    for table in tables:
+        while True:
+            query = f"SELECT contents FROM {table} LIMIT ? OFFSET ?"
+            cursor.execute(query, (batch_size, offset))
+            batch_rows = cursor.fetchall()
+            if not batch_rows:
+                break
+            for row in batch_rows:
+                contents = row[0]
+                total_words += len(contents.split())
+                total_contents += 1
+            offset += batch_size
+        offset = 0
+    if total_contents > 0:
+        average_words_per_content = total_words / total_contents
+    else:
+        average_words_per_content = 0
+
+    return average_words_per_content
+
+
+def numeric_stats(db):
+    data = dict()
+    data['Amount of news articles'] = db.count_rows('new')
+    data['Amount of wikipedia descriptions'] = db.count_rows('team_info')
+    data['Amount of game reports'] = db.count_rows('game_reports')
+    data['Average amount of words per text'] = calculate_average_words_per_content(db, ["new", "game_reports", "team_info"])
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(data.keys(), data.values())
+    plt.xlabel("Data Type")
+    plt.ylabel("Count / Average Words")
+    plt.title("Data Summary")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Show the plot
+    plt.show()
+
+
+
 def main():
     db = DB()
-    num_news_articles = db.count_rows('new')
-    num_wikipedia_descriptions = db.count_rows('team_info')
-    num_game_reports = db.count_rows('game_reports')
     distribution_by_year_and_website(db)
     create_wordcloud(db.retrieve_text_for_wordcloud())
     create_most_popular_team_plot(db)
