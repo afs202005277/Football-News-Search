@@ -72,6 +72,46 @@ def create_wordcloud(text):
     plt.show()
 
 
+def fetch_teams():
+    return ['Porto']
+
+
+def create_most_popular_teams(db):
+    teams = fetch_teams()
+    results = {team: 0 for team in teams}
+    cursor = db.get_cursor()
+    query = "SELECT title, contents FROM new LIMIT ? OFFSET ?"
+
+    batch_size = 100
+    offset = 0
+
+    while True:
+        cursor.execute(query, (batch_size, offset))
+        batch_rows = cursor.fetchall()
+        if not batch_rows:
+            break
+
+        for row in batch_rows:
+            title, contents = row
+            for team in teams:
+                if team.lower() in title.lower() or team.lower() in contents.lower():
+                    results[team] += 1
+        offset += batch_size
+    return results
+
+
+def create_most_popular_team_plot(db):
+    data = create_most_popular_teams(db)
+    plt.figure(figsize=(10, 6))
+    plt.bar(data.keys(), data.values())
+    plt.xlabel("Team")
+    plt.ylabel("Count")
+    plt.title("Mentions of Teams in News Articles")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+
 def main():
     db = DB()
     num_news_articles = db.count_rows('new')
@@ -79,6 +119,7 @@ def main():
     num_game_reports = db.count_rows('game_reports')
     distribution_by_year_and_website(db)
     create_wordcloud(db.retrieve_text_for_wordcloud())
+    create_most_popular_team_plot(db)
     db.close()
 
 

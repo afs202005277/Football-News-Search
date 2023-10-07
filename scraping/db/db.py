@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 import os
 
@@ -60,6 +59,9 @@ class DB:
         cursor.execute("SELECT content FROM game_reports")
         text += ' '.join(row[0] for row in cursor.fetchall())
         return text
+
+    def get_cursor(self):
+        return self.instance.cursor()
 
     def close(self):
         self.instance.close()
