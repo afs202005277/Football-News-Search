@@ -21,7 +21,6 @@ CREATE TABLE game_reports(
     home TEXT NOT NULL,
     away TEXT NOT NULL,
     result TEXT NOT NULL,
-    date DATE NOT NULL,
-    hour TEXT NOT NULL,
+    date DATETIME NOT NULL,
     content TEXT NOT NULL
 );
