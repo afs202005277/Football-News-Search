@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS article;
 DROP TABLE IF EXISTS team_info;
-DROP TABLE IF EXISTS game_reports;
+DROP TABLE IF EXISTS game_report;
 
 CREATE TABLE article(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE team_info(
     content TEXT NOT NULL
 );
 
-CREATE TABLE game_reports(
+CREATE TABLE game_report(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     home TEXT NOT NULL,
     away TEXT NOT NULL,
