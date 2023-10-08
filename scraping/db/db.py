@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 import os
 
@@ -39,11 +38,34 @@ class DB:
         self.instance.execute('INSERT INTO team_info(name, content) VALUES(?, ?)', data)
         self.instance.commit()
 
-    def count_rows(self):
+    def insert_new_game_report(self, data):
+        self.instance.execute('INSERT INTO game_reports(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
+        self.instance.commit()
+
+    def count_rows(self, table_name):
         cursor = self.instance.cursor()
-        cursor.execute('SELECT COUNT(*) FROM new')
+        cursor.execute('SELECT COUNT(*) FROM ' + table_name)
         count = cursor.fetchone()[0]
         return count
+
+    def retrieve_data_distribution(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT publish_date, origin FROM new")
+        return cursor.fetchall()
+
+    def retrieve_text_for_wordcloud(self):
+        cursor = self.instance.cursor()
+        text = ''
+        cursor.execute("SELECT content FROM new")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        cursor.execute("SELECT content FROM team_info")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        cursor.execute("SELECT content FROM game_reports")
+        text += ' '.join(row[0] for row in cursor.fetchall())
+        return text
+
+    def get_cursor(self):
+        return self.instance.cursor()
 
     def close(self):
         self.instance.close()

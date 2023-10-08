@@ -14,7 +14,9 @@ class RecordParser1115(Parser):
         return soup.select('div.caixaModNot a.linkUnd')
 
     def __new_content_selector__(self, soup):
-        return ''.join(soup.select('#newsBody').find_all(string=True, recursive=False)).rstrip().lstrip().replace('\n', '')
+        if self.timestamp[:4] == '2011':
+            return ''.join(soup.select('#NewsContainer .newsBody')[0].find_all(string=True, recursive=True)).rstrip().lstrip().replace('\n', '')
+        return ''.join(soup.select('#NewsContainer .texto')[0].find_all(string=True, recursive=True)).rstrip().lstrip().replace('\n', '')
     
     def __sections_selector__(self):
         return BeautifulSoup(self.html, features='lxml').select('.listaBrazoes a')
