@@ -130,8 +130,19 @@ def main():
     target_conn.close()
 
 
+def merge_with_record():
+    source_conn = sqlite3.connect('record.sqlite')
+    target_conn = sqlite3.connect('merged_db.sqlite')
+
+    merge_databases(source_conn, target_conn, False)
+
+    # Close the database connections
+    source_conn.close()
+    target_conn.close()
+
+
 if __name__ == '__main__':
-    main()
+    merge_with_record()
 
 # Remove faulty rows: DELETE FROM article WHERE id IN (4, 18, 19, 21, 22);
 # DELETE FROM article WHERE TRIM(content) = '';

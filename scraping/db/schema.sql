@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS game_report;
 
 CREATE TABLE article(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
     content TEXT NOT NULL,
     publish_date DATE NOT NULL,
     origin TEXT NOT NULL
