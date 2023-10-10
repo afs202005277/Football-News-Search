@@ -63,6 +63,7 @@ if __name__ == "__main__":
     headers = {'Accept': 'application/json'}
 
     real_offset = 0
+    db = DB()
 
     while to_date < 20231006000000:
 
@@ -75,7 +76,7 @@ if __name__ == "__main__":
             ans = pool_obj.map(scrape_link, response_items)
             pool_obj.close()
 
-            save_to_db(DB(), ans)
+            save_to_db(db, ans)
 
             offset += len(response_items)
             real_offset += len(response_items)

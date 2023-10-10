@@ -2,11 +2,9 @@ import sqlite3
 
 import os
 
-ROOT_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 SCHEMA = f'{ROOT_DIR}/schema.sql'
-DB_PATH = f'{ROOT_DIR}/db.sqlite'
+DB_PATH = f'{ROOT_DIR}/merged_db.sqlite'
 
 
 class DB:
@@ -31,7 +29,7 @@ class DB:
         print('Database initialized.')
 
     def insert_new(self, data):
-        self.instance.execute('INSERT INTO new(title, content, publish_date, origin) VALUES(?, ?, ?, ?)', data)
+        self.instance.execute('INSERT INTO article(title, content, publish_date, origin) VALUES(?, ?, ?, ?)', data)
         self.instance.commit()
 
     def insert_new_wiki(self, data):
@@ -39,7 +37,7 @@ class DB:
         self.instance.commit()
 
     def insert_new_game_report(self, data):
-        self.instance.execute('INSERT INTO game_reports(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
+        self.instance.execute('INSERT INTO game_report(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
         self.instance.commit()
 
     def count_rows(self, table_name):
@@ -50,17 +48,17 @@ class DB:
 
     def retrieve_data_distribution(self):
         cursor = self.instance.cursor()
-        cursor.execute("SELECT publish_date, origin FROM new")
+        cursor.execute("SELECT publish_date, origin FROM article")
         return cursor.fetchall()
 
     def retrieve_text_for_wordcloud(self):
         cursor = self.instance.cursor()
         text = ''
-        cursor.execute("SELECT content FROM new")
+        cursor.execute("SELECT content FROM article")
         text += ' '.join(row[0] for row in cursor.fetchall())
         cursor.execute("SELECT content FROM team_info")
         text += ' '.join(row[0] for row in cursor.fetchall())
-        cursor.execute("SELECT content FROM game_reports")
+        cursor.execute("SELECT content FROM game_report")
         text += ' '.join(row[0] for row in cursor.fetchall())
         return text
 
@@ -70,3 +68,70 @@ class DB:
     def close(self):
         self.instance.close()
         print('Database closed.')
+
+
+# Function to create the schema for the merged database using an external SQL file
+def create_merged_schema(conn):
+    with open("schema.sql", "r") as schema_file:
+        schema_sql = schema_file.read()
+    conn.executescript(schema_sql)
+
+
+# Function to merge data from one database to another
+def merge_databases(source_conn, target_conn, reset_db):
+    source_cursor = source_conn.cursor()
+    target_cursor = target_conn.cursor()
+
+    if reset_db:
+        create_merged_schema(target_conn)
+
+    source_cursor.execute("SELECT * FROM article")
+    rows = source_cursor.fetchall()
+    last_publish_date = None
+
+    for row in rows:
+        id, title, content, publish_date, origin = row
+
+        if ':' in publish_date:
+            publish_date = last_publish_date
+        else:
+            last_publish_date = publish_date
+
+        try:
+            target_cursor.execute(
+                "INSERT INTO article (title, content, publish_date, origin) VALUES (?, ?, ?, ?)",
+                (title, content, publish_date, origin)
+            )
+        except sqlite3.IntegrityError as e:
+            print(f"Error inserting row with duplicate title: {title}")
+    target_conn.commit()
+
+
+def main():
+    # Connect to the source and target databases
+    source_conn = sqlite3.connect('db_fonseca.sqlite')
+    target_conn = sqlite3.connect('merged_db.sqlite')
+
+    # Merge the data from the source database to the target database
+    merge_databases(source_conn, target_conn, True)
+
+    # Close the database connections
+    source_conn.close()
+    target_conn.close()
+
+    source_conn = sqlite3.connect('db_andre.sqlite')
+    target_conn = sqlite3.connect('merged_db.sqlite')
+
+    # Merge the data from the source database to the target database
+    merge_databases(source_conn, target_conn, False)
+
+    # Close the database connections
+    source_conn.close()
+    target_conn.close()
+
+
+if __name__ == '__main__':
+    main()
+
+# Remove faulty rows: DELETE FROM article WHERE id IN (4, 18, 19, 21, 22);
+# DELETE FROM article WHERE TRIM(content) = '';
