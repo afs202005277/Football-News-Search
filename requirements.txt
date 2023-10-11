@@ -1,10 +1,6 @@
-csv
-random
 expressions~=0.2.3
-logging
 bs4~=0.0.1
 requests~=2.31.0
-re
 beautifulsoup4~=4.12.2
 numpy~=1.23.5
 matplotlib~=3.8.0

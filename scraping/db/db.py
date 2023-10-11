@@ -40,6 +40,10 @@ class DB:
         self.instance.execute('INSERT INTO game_report(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
         self.instance.commit()
 
+    def clear_articles(self):
+        self.instance.execute("DELETE FROM article WHERE TRIM(content) = ''")
+        self.instance.commit()
+
     def count_rows(self, table_name):
         cursor = self.instance.cursor()
         cursor.execute('SELECT COUNT(*) FROM ' + table_name)

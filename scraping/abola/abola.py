@@ -1,9 +1,17 @@
 import sqlite3
 from datetime import timedelta
 from bs4 import BeautifulSoup
-from scraping.utils import *
-from scraping.RateLimitedRequest import RateLimitedRequest
-from scraping.db.db import DB
+import sys
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(f'{ROOT_DIR}/../db/')
+sys.path.append(f'{ROOT_DIR}/../')
+
+from db import DB
+from utils import *
+from RateLimitedRequest import RateLimitedRequest
 
 
 def has_no_seta_id(tag):

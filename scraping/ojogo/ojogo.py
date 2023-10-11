@@ -1,13 +1,20 @@
 import sqlite3
 from datetime import timedelta
-
-from scraping.RateLimitedRequest import RateLimitedRequest
 from bs4 import BeautifulSoup
 import requests
 import logging
-from scraping.db.db import DB
-from scraping.utils import *
 import re
+import sys
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(f'{ROOT_DIR}/../db/')
+sys.path.append(f'{ROOT_DIR}/../')
+
+from db import DB
+from utils import *
+from RateLimitedRequest import RateLimitedRequest
 
 logging.basicConfig(filename='ojogo.log', filemode='w', format='%(levelname)s - %(message)s')
 

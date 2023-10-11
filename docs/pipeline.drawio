@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-10-08T11:59:50.017Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36" etag="puBoFtHRBEG6KqaQbbZj" version="22.0.4" type="device">
+<mxfile host="app.diagrams.net" modified="2023-10-11T20:02:48.496Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36" etag="b9Osa3Y134cEeryGGZri" version="22.0.4" type="device">
   <diagram name="Página-1" id="KU5GXJ2eo6DiFCw3ZYdT">
     <mxGraphModel dx="1434" dy="768" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -52,7 +52,7 @@
         <mxCell id="26YACCqmpIW9W6Np5miB-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="LgC4L-c3pY4Z4chyAlvD-17" target="LgC4L-c3pY4Z4chyAlvD-20" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="LgC4L-c3pY4Z4chyAlvD-17" value="SQL Server" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontFamily=Lexend;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLexend;fontSize=13;" parent="1" vertex="1">
+        <mxCell id="LgC4L-c3pY4Z4chyAlvD-17" value="SQL Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontFamily=Lexend;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLexend;fontSize=13;" parent="1" vertex="1">
           <mxGeometry x="1080" y="400" width="60" height="80" as="geometry" />
         </mxCell>
         <mxCell id="LgC4L-c3pY4Z4chyAlvD-20" value="Data Exploration" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Lexend;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLexend;fontSize=13;" parent="1" vertex="1">

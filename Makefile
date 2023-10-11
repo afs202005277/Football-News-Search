@@ -1,25 +1,35 @@
 # Run the scripts to extract and process the data to the SQL database
-VENV = venv
-PYTHON = $(VENV)/bin/python
-PIP = $(VENV)/bin/pip
+PYTHON = python3
+PIP = pip3
 REQUIREMENTS = requirements.txt
 
-run: $(VENV)/bin/activate
+run: 
 	$(PYTHON) team_info.py
 	$(PYTHON) summary.py
+	$(PYTHON) scraping/record/record.py
+	$(PYTHON) scraping/ojogo/ojogo.py
+	$(PYTHON) scraping/abola/abola.py
+	$(PYTHON) scraping/abola/abola_noticias_recentes.py
 
-$(VENV)/bin/activate: requirements.txt
-	python3 -m venv $(VENV)
-	$(PIP) install -r requirements.txt
+partial: 
+	$(PYTHON) team_info.py
+	$(PYTHON) summary.py
+	$(PYTHON) scraping/record/record.py 2015
+	$(PYTHON) scraping/abola/abola_noticias_recentes.py
+
+install: 
+	$(PIP) install --upgrade pip
+	$(PIP) install -r $(REQUIREMENTS)
 
 
 # Clean up
 clean:
-	sudo rm -f ./scraping/db/db.sqlite
+	rm -f ./scraping/db/test_db.sqlite
 
 # Help text
 help:
 	@echo "Simple Makefile that handles the data following the data pipeline defined:"
+	@echo "  install - Install the requirements needed (please run this first)"
 	@echo "  run     - Run the scripts to extract and process the data to the SQL database (may take some time)"
 	@echo "  partial - Run the scripts (partially) to extract and process the data to the SQL database"
 	@echo "  clean   - Deletes the SQL database generated"

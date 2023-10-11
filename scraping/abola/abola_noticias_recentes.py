@@ -1,10 +1,18 @@
 import sqlite3
-
 import requests
 from bs4 import BeautifulSoup
 import multiprocessing
-from scraping.db.db import DB
-from scraping.RateLimitedRequest import RateLimitedRequest
+import sys
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(f'{ROOT_DIR}/../db/')
+sys.path.append(f'{ROOT_DIR}/../')
+
+from db import DB
+from utils import convert_to_uniform_date
+from RateLimitedRequest import RateLimitedRequest
 
 limitedRequest = RateLimitedRequest(220)
 def scrape_link(link):
@@ -80,16 +88,18 @@ if __name__ == "__main__":
         offset = 0
         r = limitedRequest.get('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
             offset) + '&fields=linkToNoFrame&from=' + str(from_date) + '&to=' + str(to_date), headers=headers)
-        print('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
-            offset) + '&fields=linkToNoFrame&from=' + str(from_date) + '&to=' + str(to_date))
         response_items = r.json()["response_items"]
 
         while len(response_items) != 0:
-            pool_obj = multiprocessing.Pool()
-            ans = pool_obj.map(scrape_link, response_items)
-            pool_obj.close()
+            try:
+                pool_obj = multiprocessing.Pool()
+                ans = pool_obj.map(scrape_link, response_items)
+                pool_obj.close()
+            except:
+                pass
 
             save_to_db(db, ans)
+            db.clear_articles()
 
             offset += len(response_items)
             real_offset += len(response_items)

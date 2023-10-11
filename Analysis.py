@@ -291,11 +291,11 @@ def monthly(db):
 def main():
     db = DB()
     tables = ["article", "game_report", "team_info"]
-    # distribution_by_year_and_website(db)
-    # create_wordcloud(db.retrieve_text_for_wordcloud())
+    distribution_by_year_and_website(db)
+    create_wordcloud(db.retrieve_text_for_wordcloud())
     create_most_popular_team_plot(db)
-    # numeric_stats(db, tables)
-    # most_popular_entities_plot(db)
+    numeric_stats(db, tables)
+    most_popular_entities_plot(db)
     db.close()
 
 

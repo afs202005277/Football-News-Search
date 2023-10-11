@@ -1,13 +1,15 @@
 import requests
 import sys
 import re
+import os
 
 # Places where we import files
-sys.path.append('../db/')
-sys.path.append('../')
-sys.path.append('./parsers/')
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(f'{ROOT_DIR}/../db/')
+sys.path.append(f'{ROOT_DIR}/../')
+sys.path.append(f'{ROOT_DIR}//parsers/')
 
-from db import DB
+
 from log import Log
 from bs4 import BeautifulSoup
 
