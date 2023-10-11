@@ -131,7 +131,6 @@ def create_most_popular_team_plot(db):
             s = f'{value:.2f}'
         plt.text(i, value, s, ha='center', va='bottom')
 
-
     plt.xlabel("Team")
     plt.ylabel("Count")
     plt.title("Mentions of Teams in News Articles")
@@ -292,11 +291,11 @@ def monthly(db):
 def main():
     db = DB()
     tables = ["article", "game_report", "team_info"]
-    #distribution_by_year_and_website(db)
-    #create_wordcloud(db.retrieve_text_for_wordcloud())
+    # distribution_by_year_and_website(db)
+    # create_wordcloud(db.retrieve_text_for_wordcloud())
     create_most_popular_team_plot(db)
-    #numeric_stats(db, tables)
-    #most_popular_entities_plot(db)
+    # numeric_stats(db, tables)
+    # most_popular_entities_plot(db)
     db.close()
 
 
