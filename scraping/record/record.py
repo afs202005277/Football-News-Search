@@ -12,6 +12,7 @@ sys.path.append(f'{ROOT_DIR}//parsers/')
 
 from log import Log
 from bs4 import BeautifulSoup
+from db import DB
 
 from record_parser_0607 import RecordParser0607
 from record_parser_0810 import RecordParser0810

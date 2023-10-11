@@ -24,7 +24,7 @@ install:
 
 # Clean up
 clean:
-	rm -f ./scraping/db/test_db.sqlite
+	rm -f ./scraping/db/merged_db.sqlite
 
 # Help text
 help:
