@@ -21,11 +21,17 @@ class Parser():
         raise NotImplementedError('Abstract Method - Implementation Missing')
 
     def fetch_section(self, section):
-        year = int(self.timestamp[:4])
+        if 'Sub' in section.text: return 0
+        if 'Seleç' in section.text: return 0
+        if 'Futsal' in section.text: return 0
+        if 'Iniciados' in section.text: return 0
+        if 'Juniores' in section.text: return 0
+        if 'Juvenis' in section.text: return 0
+
         if self.debug: print(f'\n==> HANDLE SECTION - {section.text}\n')
 
         news_counter = 0
-        resp = requests.get(f'https://arquivo.pt{section["href"]}')
+        resp = requests.get(section['href'] if 'arquivo.pt' in section['href'] else f'https://arquivo.pt{section["href"]}')
         soup = BeautifulSoup(resp.text, features='lxml')
         
         news = self.__news_selector__(soup)
@@ -56,8 +62,12 @@ class Parser():
                     self.log.warning(f'Did not found the text of the new - {self.timestamp} - {new.text}')
                     continue    
 
+                yyyy = self.timestamp[:4]
+                mm = self.timestamp[4:6]
+                dd = self.timestamp[6:8]
+
                 try:
-                    self.db.insert_new((new.text, content, self.timestamp, 'record'))
+                    self.db.insert_new((new.text, content, f'{dd}-{mm}-{yyyy}', 'record'))
                 except Exception as e:
                     self.log.error(f'Failed to insert into in the database, maybe duplicated - {e}')
                 finally:

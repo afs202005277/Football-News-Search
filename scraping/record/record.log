@@ -1,2 +1,6 @@
-ERROR - Failed to insert into in the database, maybe duplicated - UNIQUE constraint failed: new.title
-ERROR - Failed to insert into in the database, maybe duplicated - UNIQUE constraint failed: new.title
+WARNING - Failed to fecth new page - 20220101180358 - Notícia Record: Pizzi, Yaremchuk e Radonjic infetados 
+WARNING - Failed to fecth new page - 20220101180358 - Sporting bate Benfica na Luz e reforça liderança do campeonato
+ERROR - Failed to insert into in the database, maybe duplicated - no such table: new
+ERROR - Failed to insert into in the database, maybe duplicated - no such table: new
+WARNING - Did not found the text of the new - 20220101180358 - António Oliveira rima com Benfica: Filho de Toni assume comando da equipa B das águias
+ERROR - Failed to insert into in the database, maybe duplicated - no such table: new

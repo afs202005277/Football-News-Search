@@ -71,18 +71,6 @@ RUN_YEAR = int(sys.argv[1]) if len(sys.argv) > 1 else 2022
 for timestamp in fetch_timestamps(TIMESTAMPS_URL):
     year = int(timestamp[:4])
     if year != RUN_YEAR: continue
-
-    """
-    # Temporary code to test different scrappers
-    test_scrappers = 3
-
-    if (test_scrappers == 0 and timestamp[:4] >= '2019') or \
-       (test_scrappers == 1 and timestamp[:4] >= '2016' and timestamp[:4] < '2019') or \
-       (test_scrappers == 2 and timestamp[:4] >= '2011' and timestamp[:4] < '2016') or \
-       (test_scrappers == 3 and timestamp[:4] >= '2008' and timestamp[:4] < '2011') or \
-       (test_scrappers == 4 and timestamp[:4] >= '2006' and timestamp[:4] < '2008'):
-    """
-
     fetch_timestamp(timestamp)
 
 print('Scrapping [RECORD.PT] ended.')

@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 
 class RecordParser0810(Parser):
     def __init__(self, timestamp, html, db, log, debug):
+        self.blacklist = ['Record Premium', 'Resultados e classificações', 'Internacional', 'Poker', 'MLB', 'Wrestling', 'NFL']
         super().__init__(timestamp, html, db, log, debug)
 
     def __news_selector__(self, soup):
@@ -17,8 +18,8 @@ class RecordParser0810(Parser):
         return ''.join(soup.select('.apreto12n')[0].find_all(string=True, recursive=True)).rstrip().lstrip().replace('\n', '')
     
     def __sections_selector__(self):
-        links = BeautifulSoup(self.html, features='lxml').select('#menu-05 ul.rMenu-ver a')
+        links = BeautifulSoup(self.html, features='lxml').select('#menu-05 ul.rMenu-ver a')[:55]
         if self.timestamp[:4] == '2009':
             for link in links:
                 link['href'] = f'/noFrame/replay/{self.timestamp}/http://www.record.pt/{link["href"]}'
-        return links
+        return list(filter(lambda x : x.text not in self.blacklist, links))
