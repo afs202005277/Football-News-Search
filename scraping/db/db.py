@@ -56,14 +56,15 @@ class DB:
         text = ''
         cursor.execute("SELECT content FROM article")
         text += ' '.join(row[0] for row in cursor.fetchall())
-        cursor.execute("SELECT content FROM team_info")
-        text += ' '.join(row[0] for row in cursor.fetchall())
-        cursor.execute("SELECT content FROM game_report")
-        text += ' '.join(row[0] for row in cursor.fetchall())
         return text
 
     def get_cursor(self):
         return self.instance.cursor()
+
+    def get_num_articles(self, table_name):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT COUNT(*) FROM article WHERE origin=?", (table_name,))
+        return (cursor.fetchone())[0]
 
     def close(self):
         self.instance.close()
@@ -140,9 +141,8 @@ def merge_with_record():
     source_conn.close()
     target_conn.close()
 
-
-if __name__ == '__main__':
-    merge_with_record()
+# if __name__ == '__main__':
+#    merge_with_record()
 
 # Remove faulty rows: DELETE FROM article WHERE id IN (4, 18, 19, 21, 22);
 # DELETE FROM article WHERE TRIM(content) = '';

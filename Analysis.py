@@ -163,7 +163,11 @@ def numeric_stats(db, tables):
     data['Amount of wikipedia descriptions'] = db.count_rows('team_info')
     data['Amount of game reports'] = db.count_rows('game_report')
     data['Average amount of words per text'] = calculate_average_words_per_content(db, tables)
-    plt.figure(figsize=(10, 6))
+    data['Number of articles from Record'] = db.get_num_articles('record')
+    data['Number of articles from O Jogo'] = db.get_num_articles('ojogo')
+    data['Number of articles from A Bola'] = db.get_num_articles('abola')
+
+    plt.figure(figsize=(20, 6))
     plt.bar(data.keys(), data.values())
     for i, value in enumerate(data.values()):
         s = str(value)
@@ -232,11 +236,11 @@ def most_popular_entities_plot(db):
 def main():
     db = DB()
     tables = ["article", "game_report", "team_info"]
-    #distribution_by_year_and_website(db)
-    #create_wordcloud(db.retrieve_text_for_wordcloud())
-    #create_most_popular_team_plot(db)
+    distribution_by_year_and_website(db)
+    create_wordcloud(db.retrieve_text_for_wordcloud())
+    create_most_popular_team_plot(db)
     numeric_stats(db, tables)
-    #most_popular_entities_plot(db)
+    most_popular_entities_plot(db)
     db.close()
 
 
