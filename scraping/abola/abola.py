@@ -156,6 +156,3 @@ def main(url=None):
 
 if __name__ == "__main__":
     main()
-# url = 'https://arquivo.pt/noFrame/replay/20081021111623/http://abola.pt/nnh/ver.aspx?id=150881'
-# print(parse_text(url))
-# 2194

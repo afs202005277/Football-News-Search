@@ -8,11 +8,10 @@ sys.path.append('./scraping/db')
 
 from db import DB
 
-
-
 file_name = "full_data.csv"
 
 encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1']
+
 
 def summarize(game):
     home, away, events, date, hour, winner = game
@@ -40,7 +39,8 @@ def summarize(game):
         except:
             continue
 
-        goal_home_eve, goal_away_eve, own_goal_home_eve, own_goal_away_eve, yellow_card_eve, red_card_eve, penalty_missed_home_eve, penalty_missed_away_eve = expressions.createExpressions(home, away, minute, name)
+        goal_home_eve, goal_away_eve, own_goal_home_eve, own_goal_away_eve, yellow_card_eve, red_card_eve, penalty_missed_home_eve, penalty_missed_away_eve = expressions.createExpressions(
+            home, away, minute, name)
 
         if eve == 'goal_home':
             text += goal_home_eve[random.randint(0, 4)] + " "
@@ -70,7 +70,6 @@ for encoding in encodings_to_try:
 
         info = []
 
-
         for line in lines:
             csv_reader = csv.reader([line])
             parsed_line = next(csv_reader)
@@ -95,6 +94,3 @@ for game in info:
     db.insert_new_game_report((game[0], game[1], game[5], f"{game[3]} {game[4]}", text))
 
 db.close()
-
-
-

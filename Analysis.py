@@ -1,4 +1,6 @@
 import csv
+from datetime import datetime
+
 from unidecode import unidecode
 from scraping.db.db import DB
 import numpy as np
@@ -180,8 +182,6 @@ def numeric_stats(db, tables):
     plt.title("Data Summary")
     plt.xticks(rotation=45)
     plt.tight_layout()
-
-    # Show the plot
     plt.show()
 
 
@@ -230,6 +230,47 @@ def most_popular_entities_plot(db):
     plt.title('Top {} Most Popular Entities'.format(top_n))
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
+    plt.show()
+
+
+def monthly(db):
+    cursor = db.get_cursor()
+    cursor.execute("SELECT publish_date FROM article")
+    counter = 0
+
+    # Initialize dictionaries to store monthly counts for each year
+    yearly_counts = {}
+
+    # Fetch and process the data
+    for row in cursor.fetchall():
+        date_str = row[0]
+        try:
+            date = datetime.strptime(date_str, "%d-%m-%Y")
+            year = date.year
+            month = date.month
+
+            if year not in yearly_counts:
+                yearly_counts[year] = [0] * 12  # Initialize a list for 12 months
+
+            yearly_counts[year][month - 1] += 1  # Increment the count for the corresponding month
+        except ValueError:
+            counter += 1
+            # Handle invalid date formats or missing dates here
+            pass
+
+    # Create a plot for each year
+    for year, counts in yearly_counts.items():
+        months = range(1, 13)  # 1 to 12 for the 12 months
+        plt.figure()
+        plt.plot(months, counts, marker='o', linestyle='-')
+        plt.title(f"Monthly Evolution of Articles in {year}")
+        plt.xlabel("Month")
+        plt.ylabel("Number of Articles")
+        plt.xticks(months, ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
+        plt.grid(True)
+
+    print(counter)
+    # Show all the plots
     plt.show()
 
 

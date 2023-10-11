@@ -137,7 +137,6 @@ def merge_with_record():
 
     merge_databases(source_conn, target_conn, False)
 
-    # Close the database connections
     source_conn.close()
     target_conn.close()
 

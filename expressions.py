@@ -23,6 +23,7 @@ def createStartExpressions(home, away):
     ]
     return [home_winning_start, away_winning_start, draw_start]
 
+
 def createExpressions(home, away, minute, name):
     goal_home_eve = [
         f"Aos {minute} minutos, {name} marca um golo para a equipa da casa.",
