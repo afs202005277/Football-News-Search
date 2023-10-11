@@ -9,7 +9,7 @@ sys.path.append(f'{ROOT_DIR}/../db/')
 sys.path.append(f'{ROOT_DIR}/../')
 sys.path.append(f'{ROOT_DIR}//parsers/')
 
-
+from db import DB
 from log import Log
 from bs4 import BeautifulSoup
 
