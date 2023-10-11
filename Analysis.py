@@ -124,6 +124,14 @@ def create_most_popular_team_plot(db):
     sorted_team_dict = dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
     plt.figure(figsize=(15, 6))
     plt.bar(sorted_team_dict.keys(), sorted_team_dict.values())
+
+    for i, value in enumerate(sorted_team_dict.values()):
+        s = str(value)
+        if isinstance(value, float):
+            s = f'{value:.2f}'
+        plt.text(i, value, s, ha='center', va='bottom')
+
+
     plt.xlabel("Team")
     plt.ylabel("Count")
     plt.title("Mentions of Teams in News Articles")
@@ -225,6 +233,13 @@ def most_popular_entities_plot(db):
 
     plt.figure(figsize=(15, 6))
     plt.bar(entities, counts)
+
+    for i, value in enumerate(counts):
+        s = str(value)
+        if isinstance(value, float):
+            s = f'{value:.2f}'
+        plt.text(i, value, s, ha='center', va='bottom')
+
     plt.xlabel('Entities')
     plt.ylabel('Count')
     plt.title('Top {} Most Popular Entities'.format(top_n))
@@ -277,11 +292,11 @@ def monthly(db):
 def main():
     db = DB()
     tables = ["article", "game_report", "team_info"]
-    distribution_by_year_and_website(db)
-    create_wordcloud(db.retrieve_text_for_wordcloud())
+    #distribution_by_year_and_website(db)
+    #create_wordcloud(db.retrieve_text_for_wordcloud())
     create_most_popular_team_plot(db)
-    numeric_stats(db, tables)
-    most_popular_entities_plot(db)
+    #numeric_stats(db, tables)
+    #most_popular_entities_plot(db)
     db.close()
 
 
