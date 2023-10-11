@@ -4,11 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import multiprocessing
 from scraping.db.db import DB
+from scraping.RateLimitedRequest import RateLimitedRequest
 
-
+limitedRequest = RateLimitedRequest(220)
 def scrape_link(link):
+    global limitedRequest
     link = link['linkToNoFrame']
-    content = requests.get(link)
+    content = limitedRequest.get(link)
     soup = BeautifulSoup(content.content, features="html.parser")
 
     try:
@@ -76,8 +78,10 @@ if __name__ == "__main__":
     while to_date < 20231006000000:
 
         offset = 0
-        r = requests.get('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
+        r = limitedRequest.get('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
             offset) + '&fields=linkToNoFrame&from=' + str(from_date) + '&to=' + str(to_date), headers=headers)
+        print('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
+            offset) + '&fields=linkToNoFrame&from=' + str(from_date) + '&to=' + str(to_date))
         response_items = r.json()["response_items"]
 
         while len(response_items) != 0:
@@ -89,7 +93,7 @@ if __name__ == "__main__":
 
             offset += len(response_items)
             real_offset += len(response_items)
-            r = requests.get('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
+            r = limitedRequest.get('https://arquivo.pt/textsearch?q=nnh&siteSearch=abola.pt&maxItems=2000&offset=' + str(
                 offset) + '&fields=linkToNoFrame&from=' + str(from_date) + '&to=' + str(to_date), headers=headers)
             response_items = r.json()["response_items"]
             print("Done ", real_offset, "links")
