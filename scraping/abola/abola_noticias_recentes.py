@@ -95,11 +95,10 @@ if __name__ == "__main__":
                 pool_obj = multiprocessing.Pool()
                 ans = pool_obj.map(scrape_link, response_items)
                 pool_obj.close()
+                save_to_db(db, ans)
+                db.clear_articles()
             except:
                 pass
-
-            save_to_db(db, ans)
-            db.clear_articles()
 
             offset += len(response_items)
             real_offset += len(response_items)

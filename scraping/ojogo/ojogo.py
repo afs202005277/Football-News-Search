@@ -146,5 +146,4 @@ def main(url=None):
         db.close()
 
 
-main(
-    'https://arquivo.pt/noFrame/replay/20190831083848/https://ojogo.pt/futebol/1a-liga/rio-ave/noticias/interior/extremo-do-chelsea-a-caminho-do-rio-ave-avancam-em-italia-11241429.html')
+main()
