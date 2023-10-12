@@ -4,16 +4,16 @@ PIP = pip3
 REQUIREMENTS = requirements.txt
 
 run: 
-	$(PYTHON) team_info.py
-	$(PYTHON) summary.py
+	$(PYTHON) auxiliary_scripts/team_info.py
+	$(PYTHON) auxiliary_scripts/summary.py
 	$(PYTHON) scraping/record/record.py
 	$(PYTHON) scraping/ojogo/ojogo.py
 	$(PYTHON) scraping/abola/abola.py
 	$(PYTHON) scraping/abola/abola_noticias_recentes.py
 
 partial: 
-	$(PYTHON) team_info.py
-	$(PYTHON) summary.py
+	$(PYTHON) auxiliary_scripts/team_info.py
+	$(PYTHON) auxiliary_scripts/summary.py
 	$(PYTHON) scraping/record/record.py 2015
 	$(PYTHON) scraping/abola/abola_noticias_recentes.py
 
