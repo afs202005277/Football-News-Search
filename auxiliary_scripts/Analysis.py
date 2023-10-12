@@ -1,13 +1,18 @@
 import csv
 from datetime import datetime
-
 from unidecode import unidecode
-from scraping.db.db import DB
 import numpy as np
 import nltk
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 import spacy
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(f'{ROOT_DIR}/../scraping/db')
+
+from db import DB
 
 # Download the Portuguese stopwords if you haven't already
 nltk.download('stopwords')

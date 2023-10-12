@@ -1,7 +1,10 @@
 import csv
 import sys
+import os
 
-sys.path.append('./scraping/db')
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.append(f'{ROOT_DIR}/../scraping/db')
 
 from db import DB
 

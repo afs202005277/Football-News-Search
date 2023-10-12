@@ -1,4 +1,4 @@
-file_name = "full_data.csv"
+file_name = "../full_data.csv"
 
 encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1']
 
