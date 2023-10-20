@@ -1,6 +1,8 @@
 import json
 
 from scraping.db.db import DB
+import nltk
+from nltk.corpus import stopwords
 
 
 def main(db):
@@ -29,6 +31,14 @@ def main(db):
 
     with open('../solr/data.json', 'w', encoding='iso-8859-1') as json_file:
         json.dump(data, json_file, indent=4)
+
+    nltk.download("stopwords")
+
+    stop_words_portuguese = stopwords.words("portuguese")
+
+    with open("../solr/stopwords.txt", "w") as file:
+        for word in stop_words_portuguese:
+            file.write(word + "\n")
     return data
 
 
