@@ -1,0 +1,4 @@
+docker build -t pri-solr . && docker run -d -p 8983:8983 pri-solr
+
+
+docker stop <container_id>

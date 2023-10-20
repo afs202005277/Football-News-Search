@@ -27,7 +27,7 @@ def main(db):
         new_dict['origin'] = 'kaggle'
         data.append(new_dict)
 
-    with open('output.json', 'w') as json_file:
+    with open('../solr/data.json', 'w', encoding='iso-8859-1') as json_file:
         json.dump(data, json_file, indent=4)
     return data
 
