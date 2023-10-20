@@ -79,6 +79,34 @@ class DB:
         cursor = self.instance.cursor()
         cursor.execute("SELECT COUNT(*) FROM article WHERE origin=?", (table_name,))
         return (cursor.fetchone())[0]
+    
+    def clear_articles(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT id, title, content FROM article")
+        rows = cursor.fetchall()
+        for row in rows:
+            article_id, title, content = row
+            updated_content = content.replace("\u00A0", " ")
+            cursor.execute("UPDATE article SET content = ? WHERE id = ?", (updated_content, article_id))
+
+            if title.strip() == '' or len(content.strip()) < 20:
+                cursor.execute("DELETE FROM article WHERE id = ?", (article_id, ))
+
+
+        self.instance.commit()
+
+
+    def clear_games(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT id, content FROM game_report")
+        rows = cursor.fetchall()
+        for row in rows:
+            article_id, content = row
+            if content.strip() == '':
+                cursor.execute("DELETE FROM game_report WHERE id = ?", (article_id, ))
+
+
+        self.instance.commit()
 
     def close(self):
         self.instance.close()
