@@ -55,6 +55,16 @@ class DB:
         cursor.execute("SELECT publish_date, origin FROM article")
         return cursor.fetchall()
 
+    def fetch_articles(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT * FROM article")
+        return cursor.fetchall(), [desc[0] for desc in cursor.description]
+
+    def fetch_game_reports(self):
+        cursor = self.instance.cursor()
+        cursor.execute("SELECT * FROM game_report")
+        return cursor.fetchall(), [desc[0] for desc in cursor.description]
+
     def retrieve_text_for_wordcloud(self):
         cursor = self.instance.cursor()
         text = ''
