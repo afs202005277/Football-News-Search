@@ -2,3 +2,9 @@ docker build -t pri-solr . && docker run -d -p 8983:8983 pri-solr
 
 
 docker stop <container_id>
+
+docker run -p 8983:8983 --name pri_solr -v ${PWD}:/data -d solr:9.3 solr-precreate news_articles
+
+curl -X POST -H 'Content-type:application/json' --data-binary @./schema.json http://localhost:8983/solr/news_articles/schema
+
+docker exec pri_solr bin/post -c news_articles /data/data.json

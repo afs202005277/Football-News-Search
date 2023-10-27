@@ -37,7 +37,7 @@ class DB:
         self.instance.commit()
 
     def insert_new_game_report(self, data):
-        self.instance.execute('INSERT INTO game_report(home, away, result, date, content) VALUES(?, ?, ?, ?, ?)', data)
+        self.instance.execute('INSERT INTO game_report(home, away, result, date, content, home_goals, away_goals) VALUES(?, ?, ?, ?, ?, ?, ?)', data)
         self.instance.commit()
 
     def clear_articles(self):

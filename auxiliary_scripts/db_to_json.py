@@ -26,7 +26,7 @@ def main(db):
         tmp_row = dict(zip(columns, report))
         new_dict = dict()
         new_dict['title'] = tmp_row['home'] + ' vs ' + tmp_row['away'] + ": " + (
-            (tmp_row[tmp_row['result']] + ' Wins!') if tmp_row['result'] != 'draw' else 'Draw.')
+            (tmp_row["Vitória do " + tmp_row['result']]) if tmp_row['result'] != 'draw' else 'Terminou em empate. ') + (f"({tmp_row['home_goal']} - {tmp_row['away_goal']})") 
         new_dict['content'] = tmp_row['content']
         tmp_date = (tmp_row['date'].replace('.', '-'))[:tmp_row['date'].find(' ')]
         date_obj = datetime.datetime.strptime(tmp_date, "%d-%m-%Y")

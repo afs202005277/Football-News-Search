@@ -17,7 +17,7 @@ encodings_to_try = ['utf-8', 'latin-1', 'iso-8859-1']
 
 
 def summarize(game):
-    home, away, events, date, hour, winner = game
+    home, away, events, _, _, winner, _, _ = game
 
     home_winning_start, away_winning_start, draw_start = expressions.createStartExpressions(home, away)
 
@@ -81,10 +81,12 @@ for encoding in encodings_to_try:
             commentary = parsed_line[3]
             date = parsed_line[5]
             hour = parsed_line[6]
+            home_goals = parsed_line[7]
+            away_goals = parsed_line[8]
             winner = parsed_line[11].lower()
             commentaryFormated = commentary[1:len(commentary) - 1].replace(", ", ",").replace("\"", "").split(',')
             data = commentaryFormated if commentary != "" else []
-            info.append([home, away, data, date, hour, winner])
+            info.append([home, away, data, date, hour, winner, home_goals, away_goals])
 
         break  # Exit the loop if successful
     except UnicodeDecodeError:
@@ -94,6 +96,6 @@ db = DB()
 
 for game in info:
     text = summarize(game)
-    db.insert_new_game_report((game[0], game[1], game[5], f"{game[3]} {game[4]}", text))
+    db.insert_new_game_report((game[0], game[1], game[5], f"{game[3]} {game[4]}", text, game[6], game[7]))
 
 db.close()
