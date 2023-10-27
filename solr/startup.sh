@@ -1,17 +1,15 @@
 #!/bin/bash
 
-precreate-core news_articles
+# This script expects a container started with the following command.
+docker run -p 8983:8983 --name pri-solr -v ${PWD}:/data -d solr:9.3 solr-precreate news_articles
 
-# Start Solr in background mode so we can use the API to upload the schema
-solr start
+sleep 5
 
 # Schema definition via API
 curl -X POST -H 'Content-type:application/json' \
-    --data-binary @/data/schema.json \
+    --data-binary "@./schema.json" \
     http://localhost:8983/solr/news_articles/schema
 
-# Populate collection
-bin/post -c news_articles /data/data.json
+# Populate collection using mapped path inside container.
+docker exec -it pri-solr bin/post -c news_articles /data/data.json
 
-# Restart in foreground mode so we can access the interface
-solr restart -f

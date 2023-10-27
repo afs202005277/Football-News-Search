@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from scraping.db.db import DB
@@ -14,7 +15,9 @@ def main(db):
         new_dict = dict()
         new_dict['title'] = tmp_row['title']
         new_dict['content'] = tmp_row['content']
-        new_dict['date'] = tmp_row['publish_date']
+        tmp_date = tmp_row['publish_date']
+        date_obj = datetime.datetime.strptime(tmp_date, "%d-%m-%Y")
+        new_dict['date'] = str(date_obj.strftime("%Y-%m-%dT%H:%M:%SZ"))
         new_dict['origin'] = tmp_row['origin']
         data.append(new_dict)
 
@@ -25,7 +28,9 @@ def main(db):
         new_dict['title'] = tmp_row['home'] + ' vs ' + tmp_row['away'] + ": " + (
             (tmp_row[tmp_row['result']] + ' Wins!') if tmp_row['result'] != 'draw' else 'Draw.')
         new_dict['content'] = tmp_row['content']
-        new_dict['date'] = (tmp_row['date'].replace('.', '-'))[:tmp_row['date'].find(' ')]
+        tmp_date = (tmp_row['date'].replace('.', '-'))[:tmp_row['date'].find(' ')]
+        date_obj = datetime.datetime.strptime(tmp_date, "%d-%m-%Y")
+        new_dict['date'] = str(date_obj.strftime("%Y-%m-%dT%H:%M:%SZ"))
         new_dict['origin'] = 'kaggle'
         data.append(new_dict)
 
