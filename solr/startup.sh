@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # This script expects a container started with the following command.
-docker run -p 8983:8983 --name pri-solr -v ${PWD}:/data -d solr:9.3 solr-precreate news_articles
+docker run --rm -p 8983:8983 --name pri-solr -v ${PWD}:/data -d solr:9.3 solr-precreate news_articles
 
 sleep 5
+echo "Running on port 8983"
 
 # Schema definition via API
 curl -X POST -H 'Content-type:application/json' \
