@@ -13,6 +13,11 @@ QUERIES = [
         "name": "Biggest Transfer 2019",
         "qrels_file": "qrels_files/qrels_biggest_transfer.json",
         "query_url": "http://localhost:8983/solr/news_articles/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=10&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
+    },
+    {
+        "name": "Poor refereeing performance in important matches",
+        "qrels_file": "qrels_files/qrels_poor_referee_performance.json",
+        "query_url": "http://localhost:8983/solr/news_articles/select?q=content:%20arbitragem%20erros%20jogo%20importante&q.op=OR&indent=true&rows=30&useParams="
     }
 ]
 
