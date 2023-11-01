@@ -18,6 +18,11 @@ QUERIES = [
         "name": "Poor refereeing performance in important matches",
         "qrels_file": "qrels_files/qrels_poor_referee_performance.json",
         "query_url": "http://localhost:8983/solr/news_articles/select?q=content:%20arbitragem%20erros%20jogo%20importante&q.op=OR&indent=true&rows=30&useParams="
+    },
+    {   
+        "name": "Visiting team scoring over three goals",
+        "qrels_file": "qrels_files/qrels_away_more_than_3_goals.json",
+        "query_url": "http://localhost:8983/solr/news_articles/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&useParams="
     }
 ]
 
