@@ -29,7 +29,14 @@ QUERIES = [
 # Define metrics to be calculated
 evaluation_metrics = {
     'ap': 'Average Precision',
-    'p10': 'Precision at 10 (P@10)'
+    'p10': 'Precision at 10 (P@10)',
+    'recall_at_10': 'Recall at 10 (R@10)',
+    'f1': 'F1 Score',
+    'map': 'Mean Average Precision',
+    'ndcg': 'Normalized Discounted Cumulative Gain',
+    'r_precision': 'R-Precision',
+    'mrr': 'Mean Reciprocal Rank',
+    'p5': 'Precision at 5 (P@5)',
 }
 
 # METRICS TABLE
@@ -60,6 +67,57 @@ def ap(results, relevant):
 def p10(results, relevant, n=10):
     """Precision at N"""
     return len([doc for doc in results[:n] if doc['id'] in relevant]) / n
+
+@metric
+def recall_at_n(results, relevant, n=10):
+    """Recall at N"""
+    relevant_count = sum([1 for doc in results[:n] if doc['id'] in relevant])
+    total_relevant = len(relevant)
+
+    if total_relevant == 0:
+        return 0.0
+
+    return relevant_count / total_relevant
+
+@metric
+def f1(results, relevant):
+    """F1 Score"""
+    precision = calculate_metric('precision_at_n', results, relevant)
+    recall = calculate_metric('recall_at_n', results, relevant)
+
+    if precision + recall == 0:
+        return 0.0
+
+    return 2 * (precision * recall) / (precision + recall)
+
+@metric
+def map(results, relevant):
+    """Mean Average Precision"""
+    precision_values = []
+    relevant_count = 0
+
+    for idx, doc in enumerate(results):
+        if doc['id'] in relevant:
+            relevant_count += 1
+            precision_at_k = relevant_count / (idx + 1)
+            precision_values.append(precision_at_k)
+
+    if not precision_values:
+        return 0.0
+
+    return sum(precision_values) / len(precision_values)
+
+@metric
+def ndcg(results, relevant):
+    """Normalized Discounted Cumulative Gain"""
+    ideal_order = sorted(relevant, key=lambda x: results.index(x))
+    dcg = sum([(2**relevant_score - 1) / np.log2(rank + 1) for rank, relevant_score in enumerate(ideal_order)])
+    idcg = sum([(2**1 - 1) / np.log2(rank + 1) for rank in range(1, len(relevant) + 1)])
+
+    if idcg == 0:
+        return 0.0
+
+    return dcg / idcg
 
 
 def calculate_metric(key, results, relevant):
