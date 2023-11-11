@@ -1,4 +1,6 @@
 # SETUP
+import time
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import PrecisionRecallDisplay
 import numpy as np
@@ -142,7 +144,7 @@ for query in QUERIES:
                       ]
                       )
 
-    with open(f'metrics/results{"".join(query["name"].split(" "))}.tex', 'w') as tf:
+    with open(f'metrics/results{"".join(query["name"].split(" "))}{time.time()}.tex', 'w') as tf:
         tf.write(df.to_latex())
 
     # PRECISION-RECALL CURVE
@@ -180,4 +182,4 @@ for query in QUERIES:
 
     disp = PrecisionRecallDisplay([precision_recall_match.get(r) for r in recall_values], recall_values)
     disp.plot()
-    plt.savefig(f'metrics/precision_recall{"".join(query["name"].split(" "))}.pdf')
+    plt.savefig(f'metrics/precision_recall{"".join(query["name"].split(" "))}{time.time()}.pdf')
