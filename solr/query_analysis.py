@@ -121,6 +121,24 @@ def ndcg(results, relevant):
 
     return dcg / idcg
 
+@metric
+def r_precision(results, relevant):
+    """R-Precision"""
+    return len([doc for doc in results[:len(relevant)] if doc['id'] in relevant]) / len(relevant)
+
+@metric
+def mrr(results, relevant):
+    """Mean Reciprocal Rank"""
+    for idx, doc in enumerate(results, start=1):
+        if doc['id'] in relevant:
+            return 1 / idx
+    return 0.0
+
+@metric
+def p5(results, relevant, n=5):
+    """Precision at 5"""
+    return p10(results, relevant, n=n)
+
 
 def calculate_metric(key, results, relevant):
     return metrics[key](results, relevant)
