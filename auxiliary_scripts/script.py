@@ -39,7 +39,8 @@ parameters3 = {
     'defType': 'edismax',
     'q': 'title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~)',
     'wt': 'json',
-    'qf': " ".join(map(lambda x: x[0] + '^' + str(x[1]), [('title', 1.0), ('content', 1.0)]))
+    'qf': " ".join(map(lambda x: x[0] + '^' + str(x[1]), [('title', 1.0), ('content', 1.0)])),
+    'rows': '30'
 }
 
 BASE_URL = 'http://localhost:8983/solr/news_articles/select'

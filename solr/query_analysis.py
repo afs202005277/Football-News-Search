@@ -4,7 +4,6 @@ import time
 import matplotlib.pyplot as plt
 from sklearn.metrics import PrecisionRecallDisplay
 import numpy as np
-import json
 import requests
 import pandas as pd
 
@@ -13,18 +12,23 @@ import pandas as pd
 QUERIES = [
     {
         "name": "Biggest Transfer 2019",
-        "qrels_file": "qrels_files/qrels_biggest_transfer.json",
-        "query_url": "http://localhost:8983/solr/news_articles/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=10&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
+        "qrels_file": "qrels_files/v1/qrels_biggest_transfer.txt",
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=10&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
     },
     {
         "name": "Poor refereeing performance in important matches",
-        "qrels_file": "qrels_files/qrels_poor_referee_performance.json",
-        "query_url": "http://localhost:8983/solr/news_articles/select?q=content:%20arbitragem%20erros%20jogo%20importante&q.op=OR&indent=true&rows=30&useParams="
+        "qrels_file": "qrels_files/v1/qrels_poor_referee_performance.txt",
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%20arbitragem%20erros%20jogo%20importante&q.op=OR&indent=true&rows=30&useParams="
     },
-    {   
+    {
         "name": "Visiting team scoring over three goals",
-        "qrels_file": "qrels_files/qrels_away_more_than_3_goals.json",
-        "query_url": "http://localhost:8983/solr/news_articles/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&useParams="
+        "qrels_file": "qrels_files/v1/qrels_away_more_than_3_goals.txt",
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&useParams="
+    },
+    {
+        "name": "Benfica performance throughout matches",
+        "qrels_file": "qrels_files/v1/qrels_benfica_performance.txt",
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?defType=edismax&q=title%3ABenfica+AND+content%3A%28performance~+OR+desempenho~+OR+rendimento~%29&wt=json&qf=title%5E1.0+content%5E1.0&rows=30"
     }
 ]
 
@@ -70,6 +74,7 @@ def p10(results, relevant, n=10):
     """Precision at N"""
     return len([doc for doc in results[:n] if doc['id'] in relevant]) / n
 
+
 @metric
 def recall_at_n(results, relevant, n=10):
     """Recall at N"""
@@ -80,6 +85,7 @@ def recall_at_n(results, relevant, n=10):
         return 0.0
 
     return relevant_count / total_relevant
+
 
 @metric
 def f1(results, relevant):
@@ -92,8 +98,9 @@ def f1(results, relevant):
 
     return 2 * (precision * recall) / (precision + recall)
 
+
 @metric
-def map(results, relevant):
+def map_metric(results, relevant):
     """Mean Average Precision"""
     precision_values = []
     relevant_count = 0
@@ -109,22 +116,25 @@ def map(results, relevant):
 
     return sum(precision_values) / len(precision_values)
 
+
 @metric
 def ndcg(results, relevant):
     """Normalized Discounted Cumulative Gain"""
     ideal_order = sorted(relevant, key=lambda x: results.index(x))
-    dcg = sum([(2**relevant_score - 1) / np.log2(rank + 1) for rank, relevant_score in enumerate(ideal_order)])
-    idcg = sum([(2**1 - 1) / np.log2(rank + 1) for rank in range(1, len(relevant) + 1)])
+    dcg = sum([(2 ** relevant_score - 1) / np.log2(rank + 1) for rank, relevant_score in enumerate(ideal_order)])
+    idcg = sum([(2 ** 1 - 1) / np.log2(rank + 1) for rank in range(1, len(relevant) + 1)])
 
     if idcg == 0:
         return 0.0
 
     return dcg / idcg
 
+
 @metric
 def r_precision(results, relevant):
     """R-Precision"""
     return len([doc for doc in results[:len(relevant)] if doc['id'] in relevant]) / len(relevant)
+
 
 @metric
 def mrr(results, relevant):
@@ -133,6 +143,7 @@ def mrr(results, relevant):
         if doc['id'] in relevant:
             return 1 / idx
     return 0.0
+
 
 @metric
 def p5(results, relevant, n=5):
