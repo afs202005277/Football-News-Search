@@ -1,0 +1,50 @@
+{
+	"add-field-type": [
+        {
+            "name":"textField",
+            "class":"solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_pt.txt"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_pt.txt"}
+                ]
+            }
+        }
+    ],
+    "add-field": [
+        {
+            "name": "title",
+            "type": "textField",
+            "indexed": true
+        },
+        {
+            "name": "content",
+            "type": "textField",
+            "indexed": true
+        },
+        {
+            "name": "origin",
+            "type": "string",
+            "indexed": true
+        },
+        {
+            "name": "date",
+            "type": "pdate",
+            "indexed": true
+        }
+    ]
+}
