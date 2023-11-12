@@ -36,10 +36,9 @@ QUERIES = [
 evaluation_metrics = {
     'ap': 'Average Precision',
     'p10': 'Precision at 10 (P@10)',
-    'recall_at_10': 'Recall at 10 (R@10)',
+    'recall_at_n': 'Recall at 10 (R@10)',
     'f1': 'F1 Score',
-    'map': 'Mean Average Precision',
-    'ndcg': 'Normalized Discounted Cumulative Gain',
+    'mean_ap': 'Mean Average Precision',
     'r_precision': 'R-Precision',
     'mrr': 'Mean Reciprocal Rank',
     'p5': 'Precision at 5 (P@5)',
@@ -100,7 +99,7 @@ def f1(results, relevant):
 
 
 @metric
-def map_metric(results, relevant):
+def mean_ap(results, relevant):
     """Mean Average Precision"""
     precision_values = []
     relevant_count = 0
@@ -115,19 +114,6 @@ def map_metric(results, relevant):
         return 0.0
 
     return sum(precision_values) / len(precision_values)
-
-
-@metric
-def ndcg(results, relevant):
-    """Normalized Discounted Cumulative Gain"""
-    ideal_order = sorted(relevant, key=lambda x: results.index(x))
-    dcg = sum([(2 ** relevant_score - 1) / np.log2(rank + 1) for rank, relevant_score in enumerate(ideal_order)])
-    idcg = sum([(2 ** 1 - 1) / np.log2(rank + 1) for rank in range(1, len(relevant) + 1)])
-
-    if idcg == 0:
-        return 0.0
-
-    return dcg / idcg
 
 
 @metric
@@ -152,7 +138,9 @@ def p5(results, relevant, n=5):
 
 
 def calculate_metric(key, results, relevant):
-    return metrics[key](results, relevant)
+    # Change 'precision_at_n' to 'p10'
+    return metrics['p10'](results, relevant) if key == 'precision_at_n' else metrics[key](results, relevant)
+
 
 
 def main():
@@ -163,8 +151,15 @@ def main():
 
         # Read qrels to extract relevant documents
         relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
-        # Get query results from Solr instance
-        results = requests.get(QUERY_URL).json()['response']['docs']
+
+        try:
+            # Get query results from Solr instance
+            response = requests.get(QUERY_URL)
+            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+            results = response.json()['response']['docs']
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching results for query {query['name']}: {e}")
+            continue  # Skip to the next query if there's an error
 
         # Calculate all metrics and export results as LaTeX table
         df = pd.DataFrame([['Metric', 'Value']] +
@@ -199,16 +194,21 @@ def main():
         precision_recall_match = {k: v for k, v in zip(recall_values, precision_values)}
 
         # Extend recall_values to include traditional steps for a better curve (0.1, 0.2 ...)
-        recall_values.extend([step for step in np.arange(0.1, 1.1, 0.1) if step not in recall_values])
-        recall_values = sorted(set(recall_values))
+        recall_values_extended = sorted(set(recall_values + list(np.arange(0.1, 1.1, 0.1))))
 
         # Extend matching dict to include these new intermediate steps
-        for idx, step in enumerate(recall_values):
+        for step in recall_values_extended:
             if step not in precision_recall_match:
-                if recall_values[idx - 1] in precision_recall_match:
-                    precision_recall_match[step] = precision_recall_match[recall_values[idx - 1]]
-                else:
-                    precision_recall_match[step] = precision_recall_match[recall_values[idx + 1]]
+                closest_lower = max([s for s in precision_recall_match.keys() if s < step], default=None)
+                closest_higher = min([s for s in precision_recall_match.keys() if s > step], default=None)
+
+                if closest_lower is not None and closest_higher is not None:
+                    precision_recall_match[step] = (precision_recall_match[closest_lower] + precision_recall_match[
+                        closest_higher]) / 2
+                elif closest_lower is not None:
+                    precision_recall_match[step] = precision_recall_match[closest_lower]
+                elif closest_higher is not None:
+                    precision_recall_match[step] = precision_recall_match[closest_higher]
 
         disp = PrecisionRecallDisplay([precision_recall_match.get(r) for r in recall_values], recall_values)
         disp.plot()
