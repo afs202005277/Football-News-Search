@@ -13,7 +13,7 @@ QUERIES = [
     {
         "name": "Biggest Transfer 2019",
         "qrels_file": "qrels_files/v1/qrels_biggest_transfer.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=10&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=30&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
     },
     {
         "name": "Poor refereeing performance in important matches",
@@ -23,7 +23,7 @@ QUERIES = [
     {
         "name": "Visiting team scoring over three goals",
         "qrels_file": "qrels_files/v1/qrels_away_more_than_3_goals.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&useParams="
+        "query_url": "http://localhost:8983/solr/news_articles_v1/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&rows=30&useParams="
     },
     {
         "name": "Benfica performance throughout matches",

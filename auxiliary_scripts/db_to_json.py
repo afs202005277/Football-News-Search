@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 
 def main(db):
     articles, columns = db.fetch_articles()
-
+    counter = 0
     data = []
     for article in articles:
         tmp_row = dict(zip(columns, article))
@@ -19,6 +19,8 @@ def main(db):
         date_obj = datetime.datetime.strptime(tmp_date, "%d-%m-%Y")
         new_dict['date'] = str(date_obj.strftime("%Y-%m-%dT%H:%M:%SZ"))
         new_dict['origin'] = tmp_row['origin']
+        new_dict['id'] = str(counter)
+        counter += 1
         data.append(new_dict)
 
     reports, columns = db.fetch_game_reports()
@@ -32,6 +34,8 @@ def main(db):
         date_obj = datetime.datetime.strptime(tmp_date, "%d-%m-%Y")
         new_dict['date'] = str(date_obj.strftime("%Y-%m-%dT%H:%M:%SZ"))
         new_dict['origin'] = 'kaggle'
+        new_dict['id'] = str(counter)
+        counter += 1
         data.append(new_dict)
 
     with open('../solr/data.json', 'w', encoding='iso-8859-1') as json_file:
