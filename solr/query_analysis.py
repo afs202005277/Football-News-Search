@@ -1,34 +1,78 @@
 # SETUP
+import copy
 import time
+import urllib
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import PrecisionRecallDisplay
 import numpy as np
 import requests
 import pandas as pd
+from itertools import product
 
-# Search for testing is: (title: sporting vs benfica, origin: abola)
+def convert_parameters_to_url(base_url, parameters):
+    # Combine the base URL and parameters
+    url_parts = list(urllib.parse.urlparse(base_url))
+    url_parts[4] = urllib.parse.urlencode(parameters)
+    final_url = urllib.parse.urlunparse(url_parts)
+
+    return final_url
+
+def thorough_analysis(title, content, **substitutes):
+    keys = substitutes.keys()
+    combinations = list(product(*substitutes.values()))
+
+    to_be_tried = [None]
+    for combination in combinations:
+        content_copy = content
+        for ind, k in enumerate(keys):
+            content_copy = content_copy.replace(k, str(combination[ind]))
+        to_be_tried.append({title: content_copy})
+
+    return to_be_tried
+
+
+BASE_URL = 'http://localhost:8983/solr/news_articles_v1/select'
+ROWS = 30
 
 QUERIES = [
     {
         "name": "Biggest Transfer 2019",
         "qrels_file": "qrels_files/v1/qrels_biggest_transfer.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%22transferencia%22%0Atitle:milionaria&q.op=OR&indent=true&rows=30&fq=date:%5B2019-01-01T00:00:00Z%20TO%202019-12-31T00:00:00Z%5D&useParams="
+        "query": {
+            'defType': 'edismax',
+            'q': 'content:transferência AND title:milionaria ',
+            'fq': 'date:[2019-01-01T00:00:00Z TO 2019-12-31T00:00:00Z]',
+            'rows': ROWS
+            }
     },
     {
         "name": "Poor refereeing performance in important matches",
         "qrels_file": "qrels_files/v1/qrels_poor_referee_performance.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?q=content:%20arbitragem%20erros%20jogo%20importante&q.op=OR&indent=true&rows=30&useParams="
+        "query": {
+            'defType': 'edismax',
+            'q': 'content:(arbitragem erros jogo importante )',
+            'rows': ROWS
+            }
     },
     {
         "name": "Visiting team scoring over three goals",
         "qrels_file": "qrels_files/v1/qrels_away_more_than_3_goals.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?indent=true&q.op=OR&q=title%3A%20vs%20AND%20title%3A%5C-3%20%5C-4%20%5C-5%20%5C-6%20%5C-7%20%5C-8%20%5C-9%20%5C-10&rows=30&useParams="
+        "query": {
+            'defType': 'edismax',
+            'q': 'title: vs AND title:\-3 \-4 \-5 \-6 \-7 \-8 \-9 \-10',
+            'rows': ROWS
+            }
     },
     {
         "name": "Benfica performance throughout matches",
         "qrels_file": "qrels_files/v1/qrels_benfica_performance.txt",
-        "query_url": "http://localhost:8983/solr/news_articles_v1/select?defType=edismax&q=title%3ABenfica+AND+content%3A%28performance~+OR+desempenho~+OR+rendimento~%29&wt=json&qf=title%5E1.0+content%5E1.0&rows=30"
+        "query": {
+            'defType': 'edismax',
+            'q': 'title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~ )',
+            'qf': 'title^1.0 content^1.0',
+            'rows': ROWS
+            }
     }
 ]
 
@@ -43,6 +87,12 @@ evaluation_metrics = {
     'mrr': 'Mean Reciprocal Rank',
     'p5': 'Precision at 5 (P@5)',
 }
+
+testing_parameters = [
+    thorough_analysis('qf', 'title^X content^Y', X=range(6), Y=range(6)), #field boost
+    thorough_analysis('pf', 'title~X content~Y', X=range(6), Y=range(6)), #fuzziness
+    [{'q': '*'}], #wildcard
+]
 
 # METRICS TABLE
 # Define custom decorator to automatically calculate metric based on key
@@ -142,77 +192,121 @@ def calculate_metric(key, results, relevant):
     return metrics['p10'](results, relevant) if key == 'precision_at_n' else metrics[key](results, relevant)
 
 
+def create_precision_recall_graph(query, precision_values, recall_values, save=False):
+    precision_recall_match = {k: v for k, v in zip(recall_values, precision_values)}
+
+    # Extend recall_values to include traditional steps for a better curve (0.1, 0.2 ...)
+    recall_values_extended = sorted(set(recall_values + list(np.arange(0.1, 1.1, 0.1))))
+
+    # Extend matching dict to include these new intermediate steps
+    for step in recall_values_extended:
+        if step not in precision_recall_match:
+            closest_lower = max([s for s in precision_recall_match.keys() if s < step], default=None)
+            closest_higher = min([s for s in precision_recall_match.keys() if s > step], default=None)
+
+            if closest_lower is not None and closest_higher is not None:
+                precision_recall_match[step] = (precision_recall_match[closest_lower] + precision_recall_match[
+                    closest_higher]) / 2
+            elif closest_lower is not None:
+                precision_recall_match[step] = precision_recall_match[closest_lower]
+            elif closest_higher is not None:
+                precision_recall_match[step] = precision_recall_match[closest_higher]
+
+    disp = PrecisionRecallDisplay([precision_recall_match.get(r) for r in recall_values], recall_values)
+    disp.plot()
+    if save:
+        plt.savefig(f'metrics/precision_recall{"".join(query["name"].split(" "))}{int(time.time())}.pdf')
+
+    return disp
+
+
+def save_to_file(csv_content, name, df, precision_values, recall_values):
+    values = df.iloc[1:, 1].tolist()
+    csv_content.append(name + ';' + ';'.join(map(str, values)) + ';' + ';'.join(map(str, precision_values)) + ';' + ';'.join(map(str, recall_values)) + '\n')
+    return csv_content
 
 def main():
-    for query in QUERIES:
+    csv_content = []
+    prec_recall_columns = 0
+
+    for query_ind, query in enumerate(QUERIES):
 
         QRELS_FILE = query['qrels_file']
-        QUERY_URL = query['query_url']
 
         # Read qrels to extract relevant documents
         relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
 
-        try:
-            # Get query results from Solr instance
-            response = requests.get(QUERY_URL)
-            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
-            results = response.json()['response']['docs']
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching results for query {query['name']}: {e}")
-            continue  # Skip to the next query if there's an error
+        combinations = list(product(*testing_parameters))
+        for ind, comb in enumerate(combinations):
+            temp_query = copy.deepcopy(query)
+            for param in comb:
+                if param is None:
+                    continue
+                for key in param.keys():
+                    if key == 'q':
+                        temp_query['query']['q'] = temp_query['query']['q'].replace(' ', param[key] + ' ')
+                    else:
+                        temp_query['query'][key] = param[key]
 
-        # Calculate all metrics and export results as LaTeX table
-        df = pd.DataFrame([['Metric', 'Value']] +
-                          [
-                              [evaluation_metrics[m], calculate_metric(m, results, relevant)]
-                              for m in evaluation_metrics
-                          ]
-                          )
+            QUERY_URL = convert_parameters_to_url(BASE_URL, temp_query['query'])
 
-        with open(f'metrics/results{"".join(query["name"].split(" "))}{time.time()}.tex', 'w') as tf:
-            tf.write(df.to_latex())
+            try:
+                # Get query results from Solr instance
+                response = requests.get(QUERY_URL)
+                response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+                results = response.json()['response']['docs']
+                if len(results) > prec_recall_columns:
+                    prec_recall_columns = len(results)
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching results for query {temp_query['name']}: {e}")
+                continue  # Skip to the next query if there's an error
 
-        # PRECISION-RECALL CURVE
-        # Calculate precision and recall values as we move down the ranked list
-        precision_values = [
-            len([
-                doc
-                for doc in results[:idx]
-                if doc['id'] in relevant
-            ]) / idx
-            for idx, _ in enumerate(results, start=1)
-        ]
+            # Calculate all metrics and export results as LaTeX table
+            df = pd.DataFrame([['Metric', 'Value']] +
+                              [
+                                  [evaluation_metrics[m], calculate_metric(m, results, relevant)]
+                                  for m in evaluation_metrics
+                              ]
+                              )
 
-        recall_values = [
-            len([
-                doc for doc in results[:idx]
-                if doc['id'] in relevant
-            ]) / len(relevant)
-            for idx, _ in enumerate(results, start=1)
-        ]
+            # PRECISION-RECALL CURVE
+            # Calculate precision and recall values as we move down the ranked list
+            precision_values = [
+                len([
+                    doc
+                    for doc in results[:idx]
+                    if doc['id'] in relevant
+                ]) / idx
+                for idx, _ in enumerate(results, start=1)
+            ]
 
-        precision_recall_match = {k: v for k, v in zip(recall_values, precision_values)}
+            recall_values = [
+                len([
+                    doc for doc in results[:idx]
+                    if doc['id'] in relevant
+                ]) / len(relevant)
+                for idx, _ in enumerate(results, start=1)
+            ]
 
-        # Extend recall_values to include traditional steps for a better curve (0.1, 0.2 ...)
-        recall_values_extended = sorted(set(recall_values + list(np.arange(0.1, 1.1, 0.1))))
+            name = query['name'] + ' - ' + str(comb)
+            csv_content = save_to_file(csv_content, name, df, precision_values, recall_values)
 
-        # Extend matching dict to include these new intermediate steps
-        for step in recall_values_extended:
-            if step not in precision_recall_match:
-                closest_lower = max([s for s in precision_recall_match.keys() if s < step], default=None)
-                closest_higher = min([s for s in precision_recall_match.keys() if s > step], default=None)
+            if ind % 1000:
+                print(f"{(ind / len(combinations) / len(QUERIES) + (1/len(QUERIES)*query_ind)) * 100.0}% DONE")
 
-                if closest_lower is not None and closest_higher is not None:
-                    precision_recall_match[step] = (precision_recall_match[closest_lower] + precision_recall_match[
-                        closest_higher]) / 2
-                elif closest_lower is not None:
-                    precision_recall_match[step] = precision_recall_match[closest_lower]
-                elif closest_higher is not None:
-                    precision_recall_match[step] = precision_recall_match[closest_higher]
+            """with open(f'metrics/results{"".join(query["name"].split(" "))}{time.time()}.tex', 'w') as tf:
+                tf.write(df.to_latex())
 
-        disp = PrecisionRecallDisplay([precision_recall_match.get(r) for r in recall_values], recall_values)
-        disp.plot()
-        plt.savefig(f'metrics/precision_recall{"".join(query["name"].split(" "))}{time.time()}.pdf')
+            create_precision_recall_graph(query, precision_values, recall_values, save=True)"""
+
+        print(f"DONE QUERY: {query['name']}")
+
+    with open(f'metrics/thorough_analysis{int(time.time())}.csv', 'w') as thorough_metrics_file:
+        csv_columns = 'Metrics Tested' + ';'.join(evaluation_metrics.values()) + ';' + ';'.join([f'precision_w_{i}' for i in range(1, prec_recall_columns+2)]) + ';' + ';'.join([f'recall_w_{i}' for i in range(1, prec_recall_columns+2)]) + '\n'
+        thorough_metrics_file.write(csv_columns)
+        thorough_metrics_file.writelines(csv_content)
+
+
 
 
 if __name__ == '__main__':
