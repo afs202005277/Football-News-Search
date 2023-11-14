@@ -43,9 +43,16 @@ parameters3 = {
     'rows': '30'
 }
 
-BASE_URL = 'http://localhost:8983/solr/news_articles/select'
+parameters3 = {
+    'q': "content:(treinador^3, controvérsia, \"sc braga\"^2)",
+    'wt': 'json',
+    'rows': '60'
+}
+
+BASE_URL = 'http://localhost:8983/solr/news_articles_v1/select'
 QUERY_URL = convert_parameters_to_url(BASE_URL, parameters3)
 print(QUERY_URL)
+exit(0)
 
 # Read qrels to extract relevant documents
 relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
