@@ -219,26 +219,23 @@ def create_precision_recall_graph(query, precision_values, recall_values, save=F
 
     return disp
 
-
-def save_to_file(csv_content, name, df, precision_values, recall_values):
-    values = df.iloc[1:, 1].tolist()
-    csv_content.append(name + ';' + ';'.join(map(str, values)) + ';' + ';'.join(map(str, precision_values)) + ';' + ';'.join(map(str, recall_values)) + '\n')
-    return csv_content
-
 def main():
     csv_content = []
     prec_recall_columns = 0
 
-    for query_ind, query in enumerate(QUERIES):
+    combinations = list(product(*testing_parameters))
+    for comb_ind, comb in enumerate(combinations):
 
-        QRELS_FILE = query['qrels_file']
+        metrics_values = []
 
-        # Read qrels to extract relevant documents
-        relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
-
-        combinations = list(product(*testing_parameters))
-        for ind, comb in enumerate(combinations):
+        for query_ind, query in enumerate(QUERIES):
             temp_query = copy.deepcopy(query)
+
+            QRELS_FILE = query['qrels_file']
+
+            # Read qrels to extract relevant documents
+            relevant = list(map(lambda el: el.strip(), open(QRELS_FILE).readlines()))
+
             for param in comb:
                 if param is None:
                     continue
@@ -288,21 +285,23 @@ def main():
                 for idx, _ in enumerate(results, start=1)
             ]
 
-            name = query['name'] + ' - ' + str(comb)
-            csv_content = save_to_file(csv_content, name, df, precision_values, recall_values)
-
-            if ind % 1000:
-                print(f"{(ind / len(combinations) / len(QUERIES) + (1/len(QUERIES)*query_ind)) * 100.0}% DONE")
+            temp = df.iloc[1:, 1].tolist()
+            metrics_values.append(temp + precision_values + recall_values)
 
             """with open(f'metrics/results{"".join(query["name"].split(" "))}{time.time()}.tex', 'w') as tf:
                 tf.write(df.to_latex())
 
             create_precision_recall_graph(query, precision_values, recall_values, save=True)"""
 
-        print(f"DONE QUERY: {query['name']}")
+        if comb_ind % 10 == 0:
+            print(f"{(query_ind + comb_ind * len(QUERIES)) / (len(combinations) * len(QUERIES)) * 100.0}% DONE")
+
+        metrics_values = [str(sum(l)/len(l)) for l in list(zip(*metrics_values))]
+        name = str(comb)
+        csv_content.append(name + ';' + ';'.join(metrics_values) + '\n')
 
     with open(f'metrics/thorough_analysis{int(time.time())}.csv', 'w') as thorough_metrics_file:
-        csv_columns = 'Metrics Tested' + ';'.join(evaluation_metrics.values()) + ';' + ';'.join([f'precision_w_{i}' for i in range(1, prec_recall_columns+2)]) + ';' + ';'.join([f'recall_w_{i}' for i in range(1, prec_recall_columns+2)]) + '\n'
+        csv_columns = 'Metrics Tested' + ';' + ';'.join(evaluation_metrics.values()) + ';' + ';'.join([f'precision_w_{i}' for i in range(1, prec_recall_columns+1)]) + ';' + ';'.join([f'recall_w_{i}' for i in range(1, prec_recall_columns+1)]) + '\n'
         thorough_metrics_file.write(csv_columns)
         thorough_metrics_file.writelines(csv_content)
 
