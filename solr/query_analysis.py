@@ -44,8 +44,8 @@ QUERIES = [
             "indent": "true",
             "q.op": "OR",
             'fq': 'date:[2019-01-01T00:00:00Z TO 2019-12-31T00:00:00Z]',
-            'qf': 'title^2 content^5',
-            'pf': 'title~2 content~5',
+            'qf': 'title^2',
+            'pf': 'content~5',
             'rows': ROWS
             }
     },
@@ -56,8 +56,8 @@ QUERIES = [
             "q": "content: arbitragem erros jogo importante",
             "indent": "true",
             "q.op": "OR",
-            'qf': 'title^2 content^5',
-            'pf': 'title~2 content~5',
+            'qf': 'title^2',
+            'pf': 'content~5',
             'rows': ROWS
             }
     },
@@ -68,8 +68,8 @@ QUERIES = [
             'q': 'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
             "indent": "true",
             "q.op": "OR",
-            'qf': 'title^2 content^5',
-            'pf': 'title~2 content~5',
+            'qf': 'title^2',
+            'pf': 'content~5',
             'rows': ROWS
             }
     },
@@ -79,8 +79,8 @@ QUERIES = [
         "query": {
             'defType': 'edismax',
             'q': "title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~)",
-            'qf': 'title^2 content^5',
-            'pf': 'title~2 content~5',
+            'qf': 'title^2',
+            'pf': 'content~5',
             'rows': ROWS
             }
     }
