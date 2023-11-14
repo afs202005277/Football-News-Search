@@ -5,6 +5,7 @@ docker stop 7db360e17cc0b27bca2ffef2ed0542bbd864f6905c392f254be6c89869d08515
 
 docker run -p 8983:8983 --name pri_solr -v ${PWD}:/data -d solr:9.3 solr-precreate news_articles
 
-curl -X POST -H 'Content-type:application/json' --data-binary @./schema.json http://localhost:8983/solr/news_articles/schema
+curl -X POST -H 'Content-type:application/json' --data-binary @./schema1.json http://localhost:8983/solr/news_articles/schema
+curl -X POST -H 'Content-type:application/json' --data-binary @./schema2.json http://localhost:8983/solr/news_articles/schema
 
 docker exec pri_solr bin/post -c news_articles /data/data.json

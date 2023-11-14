@@ -40,9 +40,12 @@ QUERIES = [
         "name": "Biggest Transfer 2019",
         "qrels_file": "qrels_files/v1/qrels_biggest_transfer.txt",
         "query": {
-            'defType': 'edismax',
-            'q': 'content:transferência AND title:milionaria ',
+            "q": "content:\"transferencia\"\ntitle:milionaria",
+            "indent": "true",
+            "q.op": "OR",
             'fq': 'date:[2019-01-01T00:00:00Z TO 2019-12-31T00:00:00Z]',
+            'qf': 'title^2 content^5',
+            'pf': 'title~2 content~5',
             'rows': ROWS
             }
     },
@@ -50,8 +53,11 @@ QUERIES = [
         "name": "Poor refereeing performance in important matches",
         "qrels_file": "qrels_files/v1/qrels_poor_referee_performance.txt",
         "query": {
-            'defType': 'edismax',
-            'q': 'content:(arbitragem erros jogo importante )',
+            "q": "content: arbitragem erros jogo importante",
+            "indent": "true",
+            "q.op": "OR",
+            'qf': 'title^2 content^5',
+            'pf': 'title~2 content~5',
             'rows': ROWS
             }
     },
@@ -59,8 +65,11 @@ QUERIES = [
         "name": "Visiting team scoring over three goals",
         "qrels_file": "qrels_files/v1/qrels_away_more_than_3_goals.txt",
         "query": {
-            'defType': 'edismax',
-            'q': 'title: vs AND title:\-3 \-4 \-5 \-6 \-7 \-8 \-9 \-10',
+            'q': 'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
+            "indent": "true",
+            "q.op": "OR",
+            'qf': 'title^2 content^5',
+            'pf': 'title~2 content~5',
             'rows': ROWS
             }
     },
@@ -69,8 +78,9 @@ QUERIES = [
         "qrels_file": "qrels_files/v1/qrels_benfica_performance.txt",
         "query": {
             'defType': 'edismax',
-            'q': 'title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~ )',
-            'qf': 'title^1.0 content^1.0',
+            'q': "title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~)",
+            'qf': 'title^2 content^5',
+            'pf': 'title~2 content~5',
             'rows': ROWS
             }
     }
