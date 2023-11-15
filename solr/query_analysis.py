@@ -32,13 +32,13 @@ def thorough_analysis(title, content, **substitutes):
     return to_be_tried
 
 
-BASE_URL = 'http://localhost:8983/solr/news_articles_v1/select'
+BASE_URL = 'http://localhost:8984/solr/news_articles_v2/select'
 ROWS = 30
 
 QUERIES = [
     {
         "name": "Biggest Transfer 2019",
-        "qrels_file": "qrels_files/v1/qrels_biggest_transfer.txt",
+        "qrels_file": "qrels_files/transfer.txt",
         "query": {
             "q": "content:\"transferencia\"\ntitle:milionaria",
             "indent": "true",
@@ -51,7 +51,7 @@ QUERIES = [
     },
     {
         "name": "Poor refereeing performance in important matches",
-        "qrels_file": "qrels_files/v1/qrels_poor_referee_performance.txt",
+        "qrels_file": "qrels_files/arb.txt",
         "query": {
             "q": "content: arbitragem erros jogo importante",
             "indent": "true",
@@ -63,7 +63,7 @@ QUERIES = [
     },
     {
         "name": "Visiting team scoring over three goals",
-        "qrels_file": "qrels_files/v1/qrels_away_more_than_3_goals.txt",
+        "qrels_file": "qrels_files/3_goals.txt",
         "query": {
             'q': 'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
             "indent": "true",
@@ -75,7 +75,7 @@ QUERIES = [
     },
     {
         "name": "Benfica performance throughout matches",
-        "qrels_file": "qrels_files/v1/qrels_benfica_performance.txt",
+        "qrels_file": "qrels_files/benfica.txt",
         "query": {
             'defType': 'edismax',
             'q': "title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~)",

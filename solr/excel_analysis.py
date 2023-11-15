@@ -32,7 +32,7 @@ def get_excel_values(query):
                 qrels.append(int(line.strip()))
 
         sol = []
-        for i in range(min(len(results), 30)):
+        for i in range(min(len(results), 60)):
             idx = int(results[i]['id'])
             if idx in qrels:
                 sol.append(1)

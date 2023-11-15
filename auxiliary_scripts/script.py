@@ -44,12 +44,12 @@ parameters3 = {
 }
 
 parameters3 = {
-    'q': "content:(treinador^3, controvérsia, \"sc braga\"^2)",
+    'q': "content:transferencia title:milionaria ",
     'wt': 'json',
     'rows': '60'
 }
 
-BASE_URL = 'http://localhost:8983/solr/news_articles_v1/select'
+BASE_URL = 'http://localhost:8984/solr/news_articles_v2/select'
 QUERY_URL = convert_parameters_to_url(BASE_URL, parameters3)
 print(QUERY_URL)
 exit(0)
