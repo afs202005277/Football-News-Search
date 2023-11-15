@@ -77,8 +77,7 @@ QUERIES = [
         "name": "Benfica performance throughout matches",
         "qrels_file": "qrels_files/benfica.txt",
         "query": {
-            'defType': 'edismax',
-            'q': "title:Benfica AND content:(performance~ OR desempenho~ OR rendimento~)",
+            'q': "title:Benfica AND content:(performance OR desempenho OR rendimento)",
             'qf': 'title^2',
             'pf': 'content~5',
             'rows': ROWS
