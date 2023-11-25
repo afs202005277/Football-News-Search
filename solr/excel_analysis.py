@@ -18,9 +18,6 @@ def get_best_boosts(file_path):
 def get_excel_values(query):
     try:
         query_url = convert_parameters_to_url(BASE_URL, query['query'])
-
-        print(query_url)
-
         response = requests.get(query_url)
         response.raise_for_status()
         results = response.json()['response']['docs']
@@ -39,7 +36,7 @@ def get_excel_values(query):
             else:
                 sol.append(0)
 
-        print(sol)
+        return sol
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching results for query '{query['name']}': {e}")
