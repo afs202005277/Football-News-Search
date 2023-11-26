@@ -34,4 +34,4 @@ curl -X POST -H 'Content-type:application/json' \
     http://localhost:8985/solr/news_articles_v3/schema
 
 # Populate collection using mapped path inside container.
-sudo docker exec -it pri-solr-v3 bin/post -c news_articles_v3 /data/data.json
+sudo docker exec -it pri-solr-v3 bin/post -c news_articles_v3 /data/data_embeddings.json

@@ -27,6 +27,13 @@
                     {"class": "solr.StopFilterFactory", "words": "lang/stopwords_pt.txt"}
                 ]
             }
+        },
+        {
+            "name": "articleVector",
+            "class": "solr.DenseVectorField",
+            "vectorDimension": 384,
+            "similarityFunction": "cosine",
+            "knnAlgorithm": "hnsw"
         }
     ],
     "add-field": [
@@ -49,6 +56,12 @@
             "name": "date",
             "type": "pdate",
             "indexed": true
+        },
+        {
+            "name": "vector",
+            "type": "articleVector",
+            "indexed": true,
+            "stored": true
         }
     ]
 }
