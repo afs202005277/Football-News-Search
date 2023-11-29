@@ -13,11 +13,11 @@ def load_translation_data():
     return json.loads(f)
 
 def load_data():
-    f = open('./data.json', 'r').read()
+    f = open('./data_embeddings.json', 'r').read()
     return json.loads(f)
 
 def save_data(data):
-    with open('./data.json', 'w', encoding='utf-8') as file:
+    with open('./data_embeddings.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 def analyze_sentiment(document):
