@@ -23,7 +23,6 @@ def get_excel_values(query):
         results = response.json()['response']['docs']
         qrels = []
 
-
         with open(query['qrels_file'], 'r') as file:
             for line in file:
                 qrels.append(int(line.strip()))
@@ -43,4 +42,4 @@ def get_excel_values(query):
         return
 
 #get_best_boosts('metrics/thorough_analysis1699992951.csv')
-get_excel_values(QUERIES[3])
+print(get_excel_values(QUERIES[3]))
