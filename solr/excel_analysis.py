@@ -1,6 +1,7 @@
 import pandas as pd
+from sentence_transformers import SentenceTransformer
 
-from query_analysis import QUERIES, BASE_URL, convert_parameters_to_url
+from query_analysis import QUERIES, BASE_URL, convert_parameters_to_url, ROWS
 import requests
 
 
@@ -15,17 +16,45 @@ def get_best_boosts(file_path):
     print(df[['Metrics Tested']].iloc[0])
 
 
+def text_to_embedding(text):
+    model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+    embedding = model.encode(text, convert_to_tensor=False).tolist()
+
+    # Convert the embedding to the expected format
+    embedding_str = "[" + ",".join(map(str, embedding)) + "]"
+    return embedding_str
+
+
+def solr_knn_query(base_url, embedding):
+
+    data = {
+        "q": f"{{!knn f=vector topK={ROWS}}}{embedding}",
+        "fl": "id,title,score",
+        "rows": ROWS,
+        "wt": "json"
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    response = requests.post(base_url, data=data, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+
 def get_excel_values(query):
+    embedding = True
     try:
-        query_url = convert_parameters_to_url(BASE_URL, query['query'])
-
-        print(query_url)
-
-        response = requests.get(query_url)
-        response.raise_for_status()
-        results = response.json()['response']['docs']
+        if embedding:
+            response = solr_knn_query(BASE_URL, text_to_embedding(query['name']))
+            results = response['response']['docs']
+        else:
+            query_url = convert_parameters_to_url(BASE_URL, query['query'])
+            response = requests.get(query_url)
+            response.raise_for_status()
+            results = response.json()['response']['docs']
         qrels = []
-
 
         with open(query['qrels_file'], 'r') as file:
             for line in file:
@@ -39,11 +68,12 @@ def get_excel_values(query):
             else:
                 sol.append(0)
 
-        print(sol)
+        return sol
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching results for query '{query['name']}': {e}")
         return
 
-#get_best_boosts('metrics/thorough_analysis1699992951.csv')
-get_excel_values(QUERIES[3])
+
+# get_best_boosts('metrics/thorough_analysis1699992951.csv')
+print(get_excel_values(QUERIES[3]))

@@ -1,0 +1,77 @@
+{
+	"add-field-type": [
+        {
+            "name":"textField",
+            "class":"solr.TextField",
+            "indexAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class": "solr.SynonymGraphFilterFactory", "ignoreCase": true, "synonyms": "pri_synonyms.txt", "expand": true},
+                    {"class": "solr.FlattenGraphFilterFactory"},
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_pt.txt"}
+                ]
+            },
+            "queryAnalyzer":{
+                "tokenizer":{
+                    "class":"solr.StandardTokenizerFactory"
+                },
+                "filters":[
+                    {"class": "solr.SynonymGraphFilterFactory", "ignoreCase": true, "synonyms": "pri_synonyms.txt", "expand": true},
+                    {"class": "solr.FlattenGraphFilterFactory"},
+                    {"class":"solr.ASCIIFoldingFilterFactory", "preserveOriginal":true},
+                    {"class":"solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_pt.txt"}
+                ]
+            }
+        },
+        {
+            "name": "articleVector",
+            "class": "solr.DenseVectorField",
+            "vectorDimension": 384,
+            "similarityFunction": "cosine",
+            "knnAlgorithm": "hnsw"
+        },
+        {
+            "name": "float",
+            "class": "solr.FloatPointField"
+        }
+    ],
+    "add-field": [
+        {
+            "name": "title",
+            "type": "textField",
+            "indexed": true
+        },
+        {
+            "name": "content",
+            "type": "textField",
+            "indexed": true
+        },
+        {
+            "name": "origin",
+            "type": "string",
+            "indexed": true
+        },
+        {
+            "name": "date",
+            "type": "pdate",
+            "indexed": true
+        },
+        {
+            "name": "vector",
+            "type": "articleVector",
+            "indexed": true,
+            "stored": true
+        },
+        {
+            "name": "sentiment",
+            "type": "float",
+            "indexed": true,
+            "stored": true
+        }
+    ]
+}
