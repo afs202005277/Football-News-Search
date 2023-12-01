@@ -38,6 +38,7 @@ ROWS = 30
 QUERIES = [
     {
         "name": "Biggest Transfer 2019",
+        "query_name": "Maior transferência monetária de 2019",
         "qrels_file": "qrels_files/transfer.txt",
         "query": {
             "q": "content:\"transferencia\"\ntitle:milionaria",
@@ -51,6 +52,7 @@ QUERIES = [
     },
     {
         "name": "Poor refereeing performance in important matches",
+        "query_name": "Má arbitragem em jogos importantes",
         "qrels_file": "qrels_files/arb.txt",
         "query": {
             "q": "content: arbitragem erros jogo importante",
@@ -63,6 +65,7 @@ QUERIES = [
     },
     {
         "name": "Visiting team scoring over three goals",
+        "query_name": "Equipa visitante marca mais de 3 golos",
         "qrels_file": "qrels_files/3_goals.txt",
         "query": {
             'q': 'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
@@ -75,6 +78,7 @@ QUERIES = [
     },
     {
         "name": "Benfica performance throughout matches",
+        "query_name": "Desempenho do Benfica ao longo dos jogos",
         "qrels_file": "qrels_files/benfica.txt",
         "query": {
             'q': "title:Benfica AND content:(performance OR desempenho OR rendimento)",

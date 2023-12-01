@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
@@ -29,7 +31,7 @@ def solr_knn_query(base_url, embedding):
 
     data = {
         "q": f"{{!knn f=vector topK={ROWS}}}{embedding}",
-        "fl": "id,title,score",
+        "fl": "title,content,date,origin,id",
         "rows": ROWS,
         "wt": "json"
     }
@@ -47,7 +49,7 @@ def get_excel_values(query):
     embedding = True
     try:
         if embedding:
-            response = solr_knn_query(BASE_URL, text_to_embedding(query['name']))
+            response = solr_knn_query(BASE_URL, text_to_embedding(query['query_name']))
             results = response['response']['docs']
         else:
             query_url = convert_parameters_to_url(BASE_URL, query['query'])
@@ -60,6 +62,8 @@ def get_excel_values(query):
             for line in file:
                 qrels.append(int(line.strip()))
 
+        with open('qrels_files/temp.json', 'w', encoding='utf-8') as file:
+            json.dump(results, file, ensure_ascii=False, indent=4)
         sol = []
         for i in range(min(len(results), 60)):
             idx = int(results[i]['id'])
