@@ -1,3 +1,4 @@
+
 function formHTML(){
     return `
         <form class="w-75 m-auto d-flex justify-content-center align-items-center flex-grow-1">
@@ -55,8 +56,11 @@ function formHTML(){
 
 function renderHome(){
     document.querySelector('body').innerHTML = `
-    <div class="w-75">
-        ${formHTML()}
+    <div id="search">
+        <img src="../static/logo.png" width="400px" alt="News Logo">
+        <div class="w-75">
+            ${formHTML()}
+        </div>
     </div>
     `
     bindForm()
@@ -66,21 +70,86 @@ function loading(){
     document.querySelector('body').innerHTML = `<div class="spinner-grow" role="status"></div><div class="spinner-grow" role="status"></div><div class="spinner-grow" role="status"></div>`
 }
 
+function loadSeeMore() {
+    let seeMoreButtons = document.querySelectorAll('.seeMoreButton')
+    
+    for (let i = 0; i < seeMoreButtons.length; i++) {
+        seeMoreButtons[i].addEventListener('click', function() {
+            box = seeMoreButtons[i].parentElement
+            box.textContent = `${window.teamInfo[box.previousSibling.textContent]}`
+        })
+    }
+}
+
 function openArticle(article){
     localStorage.setItem('cachedResults', document.querySelector('ul').outerHTML)
+
+    const words = article.content.split(' ');
+
+    article.content = ""
+    words.forEach(word => {
+        if (window.teamInfo.hasOwnProperty(word)) {
+            article.content += `<span class="text-danger font-weight-bold info">${word}</span><span class="invisible infoBox">${window.teamInfo[word].substring(0, 100)} <span class="text-danger font-weight-bold info seeMoreButton">Ver Mais</span></span> `
+        }
+        else {
+            article.content += `${word} `
+        }
+        
+    });
 
     document.querySelector('ul').outerHTML = `
         <article class="d-flex justify-content-center">
             <a id="back"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></a>
             <div class="card w-75 m-auto expanded">
                 <div class="card-body">
-                    <a class="card-title">${article.title}</a>
-                    <p class="card-text py-2">${article.content}</p>
+                    <a class="card-title">${article.title.trim()}</a>
+                    <p class="card-text py-2">${article.content.trim()}</p>
                 </div>
             </div>
         </article>
     `
 
+    loadSeeMore()
+
+    let boxKeyWords = document.querySelectorAll('.infoBox')
+
+    var timeoutID = -1;
+
+    for (let i = 0; i < boxKeyWords.length; i++) {
+       
+        boxKeyWords[i].addEventListener('mouseover', function() {
+            if (boxKeyWords[i].classList.contains("visible")) {
+                clearTimeout(timeoutID)
+            }
+        
+        })
+        boxKeyWords[i].addEventListener('mouseleave', function() {
+            if (boxKeyWords[i].classList.contains("visible")) {
+                boxKeyWords[i].classList.replace("visible", "invisible")
+                boxKeyWords[i].innerHTML = `${window.teamInfo[boxKeyWords[i].previousSibling.textContent].substring(0, 100)} <span class="text-danger font-weight-bold info seeMoreButton">Ver Mais</span></span>`
+                loadSeeMore()
+            }
+          
+        })
+        
+    }
+
+    let keyWords = document.querySelectorAll('.info')
+
+    for (let i = 0; i < keyWords.length; i++) {
+        keyWords[i].addEventListener('mouseover', function() {
+            const box = keyWords[i].nextSibling
+            if (box) box.classList.replace("invisible", "visible")
+        })
+
+        keyWords[i].addEventListener('mouseleave', function() {
+            const box = keyWords[i].nextSibling
+            timeoutID = setTimeout(() => {
+                if (box) box.classList.replace("visible", "invisible")
+            }, "50");
+        })
+        
+    }
     document.getElementById('back').addEventListener('click', renderCached)
 }
 
@@ -122,8 +191,8 @@ function renderResults(data){
 
     document.querySelector('body').innerHTML = `
         <main>
-            <div class="p-5 d-flex align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" id="icon" class="mr-5" height="48" width="48" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M417.3 360.1l-71.6-4.8c-5.2-.3-10.3 1.1-14.5 4.2s-7.2 7.4-8.4 12.5l-17.6 69.6C289.5 445.8 273 448 256 448s-33.5-2.2-49.2-6.4L189.2 372c-1.3-5-4.3-9.4-8.4-12.5s-9.3-4.5-14.5-4.2l-71.6 4.8c-17.6-27.2-28.5-59.2-30.4-93.6L125 228.3c4.4-2.8 7.6-7 9.2-11.9s1.4-10.2-.5-15l-26.7-66.6C128 109.2 155.3 89 186.7 76.9l55.2 46c4 3.3 9 5.1 14.1 5.1s10.2-1.8 14.1-5.1l55.2-46c31.3 12.1 58.7 32.3 79.6 57.9l-26.7 66.6c-1.9 4.8-2.1 10.1-.5 15s4.9 9.1 9.2 11.9l60.7 38.2c-1.9 34.4-12.8 66.4-30.4 93.6zM256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm14.1-325.7c-8.4-6.1-19.8-6.1-28.2 0L194 221c-8.4 6.1-11.9 16.9-8.7 26.8l18.3 56.3c3.2 9.9 12.4 16.6 22.8 16.6h59.2c10.4 0 19.6-6.7 22.8-16.6l18.3-56.3c3.2-9.9-.3-20.7-8.7-26.8l-47.9-34.8z"/></svg>
+            <div class="p-5 d-flex align-items-center align-items-center justify-content-center">
+                <img src="../static/logo.png" width="90px" alt="News Logo">
                 ${formHTML()}
             </div>
             ${data.length == 0
@@ -144,11 +213,15 @@ function renderResults(data){
 async function performSearch(query, team, origin){
     const BACKEND_URL = 'http://localhost:5000/solr/'
 
+    var query = `${team} ${origin} ${query}`
+
+    /*
     var query = {
         q: `${team ? `(title:${team}) AND ` : ''}${origin ? `(origin:${origin}) AND ` : ''}(content:${query})`,
         rows: 10,
         wt: "json"
     };
+    */
 
     loading()
 
