@@ -4,7 +4,7 @@ import requests
 
 ROWS = 30
 
-BASE_URL = 'http://localhost:8983/solr/news_articles_v3/select' # SCHEMA 3
+BASE_URL = 'http://localhost:8985/solr/news_articles_v3/select' # SCHEMA 3
 
 app = Flask(__name__)
 
