@@ -1,3 +1,5 @@
+let relevantDocuments = []
+let divsSeen = []
 
 function formHTML(){
     return `
@@ -156,6 +158,7 @@ function openArticle(article){
 function renderCached(){
     document.querySelector('article').outerHTML = localStorage.getItem('cachedResults')
     bindArticles()
+    frontendStatistic()
 }
 
 function renderArticle(article){
@@ -208,6 +211,7 @@ function renderResults(data){
 
     bindArticles()
     bindForm()
+    frontendStatistic()
 }
 
 async function performSearch(query, team, origin){
@@ -266,3 +270,25 @@ function bindForm(){
 }
 
 renderHome()
+
+function frontendStatistic() {
+    const articles = document.querySelectorAll('ul a.card-title')
+
+    for (let i = 0; i < articles.length; i++) {
+        articles[i].addEventListener('mouseover', function() {console.log(relevantDocuments)})
+        articles[i].addEventListener('mouseleave', function() {
+            if (!divsSeen.includes(i)) {
+                relevantDocuments.push(0)
+                divsSeen.push(i)
+            }
+            
+        })
+        articles[i].addEventListener('click', function() {
+            if (!divsSeen.includes(i)) {
+                relevantDocuments.push(1)
+                divsSeen.push(i)
+            }  
+        })
+    }
+
+}
