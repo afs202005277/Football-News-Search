@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from sentence_transformers import SentenceTransformer
 import requests
+from urllib.parse import unquote
 
 ROWS = 30
 
@@ -37,8 +38,9 @@ def solr_knn_query(base_url, embedding):
 
 @app.route('/solr/')
 def solr():
-    query = request.query_string.decode('utf-8')
+    query = unquote(request.query_string.decode('utf-8')).strip()
     print(query)
+
     response = solr_knn_query(BASE_URL, text_to_embedding(query))
     return response['response']['docs']
 
@@ -56,4 +58,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=5000)

@@ -28,7 +28,6 @@ def text_to_embedding(text):
 
 
 def solr_knn_query(base_url, embedding):
-
     data = {
         "q": f"{{!knn f=vector topK={ROWS}}}{embedding}",
         "fl": "title,content,date,origin,id",
@@ -46,7 +45,7 @@ def solr_knn_query(base_url, embedding):
 
 
 def get_excel_values(query):
-    embedding = True
+    embedding = False
     try:
         if embedding:
             response = solr_knn_query(BASE_URL, text_to_embedding(query['query_name']))
@@ -80,4 +79,5 @@ def get_excel_values(query):
 
 
 # get_best_boosts('metrics/thorough_analysis1699992951.csv')
-print(get_excel_values(QUERIES[3]))
+for i in range(len(QUERIES)):
+    print(get_excel_values(QUERIES[i]))

@@ -214,10 +214,12 @@ function renderResults(data){
     frontendStatistic()
 }
 
-async function performSearch(query, team, origin){
+async function performSearch(query_text, team, origin){
     const BACKEND_URL = 'http://localhost:5000/solr/'
-
-    var query = `${team} ${origin} ${query}`
+    var query = ""
+    if (team != "") query += `${team} `
+    if (origin != "") query += `${origin}`
+    query += `${query_text}`
 
     /*
     var query = {

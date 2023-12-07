@@ -32,7 +32,7 @@ def thorough_analysis(title, content, **substitutes):
     return to_be_tried
 
 
-BASE_URL = 'http://localhost:8985/solr/news_articles_v3/select'
+BASE_URL = 'http://localhost:8986/solr/news_articles_v4/select'
 ROWS = 30
 
 QUERIES = [
