@@ -19,11 +19,11 @@ def text_to_embedding(text):
     return embedding_str
 
 
-def solr_knn_query(base_url, embedding):
+def solr_knn_query(base_url, embedding, rows=30):
     data = {
-        "q": f"{{!knn f=vector topK={ROWS}}}{embedding}",
+        "q": f"{{!knn f=vector topK={rows}}}{embedding}",
         "fl": "title,content,date,origin,id",
-        "rows": ROWS,
+        "rows": rows,
         "wt": "json"
     }
 
@@ -34,6 +34,16 @@ def solr_knn_query(base_url, embedding):
     response = requests.post(base_url, data=data, headers=headers)
     response.raise_for_status()
     return response.json()
+
+@app.route('/relatedContent/')
+def relatedContent():
+    document = unquote(request.query_string.decode('utf-8')).strip()
+    print(document)
+
+    response = solr_knn_query(BASE_URL, text_to_embedding(document), 4)
+
+    return response['response']['docs']
+
 
 
 @app.route('/solr/')

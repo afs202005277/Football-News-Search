@@ -84,7 +84,25 @@ function loadSeeMore() {
 }
 
 function openArticle(article){
-    localStorage.setItem('cachedResults', document.querySelector('ul').outerHTML)
+    if (document.querySelector('ul')) localStorage.setItem('cachedResults', document.querySelector('ul').outerHTML)
+
+    const BACKEND_URL = 'http://localhost:5000/relatedContent/'
+    let doc = `${article.title} ${article.content}`
+
+
+    $.ajax({
+        url: BACKEND_URL,
+        data: doc,
+        dataType: 'json',
+        headers: { method: 'GET' },
+        success: function(data) {
+            renderRelated(data)
+        },
+        error: function(_) {
+            renderHome()
+        }
+    });
+
 
     const words = article.content.split(' ');
 
@@ -99,17 +117,42 @@ function openArticle(article){
         
     });
 
-    document.querySelector('ul').outerHTML = `
-        <article class="d-flex justify-content-center">
-            <a id="back"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></a>
-            <div class="card w-75 m-auto expanded">
-                <div class="card-body">
-                    <a class="card-title">${article.title.trim()}</a>
-                    <p class="card-text py-2">${article.content.trim()}</p>
+    if (document.querySelector('ul')) {
+        document.querySelector('ul').outerHTML = `
+            <article class="d-flex justify-content-center flex-column">
+                <a id="back"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></a>
+                <div class="card w-75 m-auto expanded">
+                    <div class="card-body">
+                        <a class="card-title">${article.title.trim()}</a>
+                        <p class="card-text py-2">${article.content.trim()}</p>
+                    </div>
                 </div>
-            </div>
-        </article>
-    `
+                <div class="card w-75 m-auto expanded">
+                    <h2>Related Articles</h2>
+                    <div id="relatedArticles">
+                    </div>
+                </div>
+            </article>
+        `
+    }
+    else {
+        document.querySelector('article').outerHTML = `
+            <article class="d-flex justify-content-center flex-column">
+                <a id="back"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></a>
+                <div class="card w-75 m-auto expanded">
+                    <div class="card-body">
+                        <a class="card-title">${article.title.trim()}</a>
+                        <p class="card-text py-2">${article.content.trim()}</p>
+                    </div>
+                </div>
+                <div class="card w-75 m-auto expanded">
+                    <h2>Related Articles</h2>
+                    <div id="relatedArticles">
+                    </div>
+                </div>
+            </article>
+        `
+    }
 
     loadSeeMore()
 
@@ -153,6 +196,29 @@ function openArticle(article){
         
     }
     document.getElementById('back').addEventListener('click', renderCached)
+}
+
+function renderRelated(docs) {
+    console.log(docs)
+    for (let i = 1; i < docs.length; i++) {
+        const article = docs[i]
+
+        const icon = article.origin == 'record' 
+        ? 'record.ico'
+        : article.origin == 'ojogo'
+            ? 'ojogo.png'
+            : 'abola.ico'
+
+        const card = document.createElement('div')
+        card.classList.add('card')
+        document.querySelector('#relatedArticles').appendChild(card)
+        card.innerHTML = `<div class="card-body">
+        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a>
+    </div>`
+        card.addEventListener('click', () => {
+            openArticle(article)
+        })
+    }
 }
 
 function renderCached(){
