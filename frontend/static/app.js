@@ -199,7 +199,6 @@ function openArticle(article){
 }
 
 function renderRelated(docs) {
-    console.log(docs)
     for (let i = 1; i < docs.length; i++) {
         const article = docs[i]
 
@@ -219,6 +218,7 @@ function renderRelated(docs) {
             openArticle(article)
         })
     }
+    frontendStatistic()
 }
 
 function renderCached(){
@@ -340,7 +340,7 @@ function bindForm(){
 renderHome()
 
 function frontendStatistic() {
-    const articles = document.querySelectorAll('ul a.card-title')
+    const articles = document.querySelectorAll('a.card-title')
 
     for (let i = 0; i < articles.length; i++) {
         articles[i].addEventListener('mouseover', function() {console.log(relevantDocuments)})
