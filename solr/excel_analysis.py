@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from query_analysis import QUERIES, BASE_URL, convert_parameters_to_url, ROWS
+from query_analysis import QUERIES, convert_parameters_to_url, ROWS
 import requests
 
 
@@ -44,14 +44,13 @@ def solr_knn_query(base_url, embedding):
     return response.json()
 
 
-def get_excel_values(query):
-    embedding = False
+def get_excel_values(query, embedding, base_url):
     try:
         if embedding:
-            response = solr_knn_query(BASE_URL, text_to_embedding(query['query_name']))
+            response = solr_knn_query(base_url, text_to_embedding(query['query_name']))
             results = response['response']['docs']
         else:
-            query_url = convert_parameters_to_url(BASE_URL, query['query'])
+            query_url = convert_parameters_to_url(base_url, query['query'])
             response = requests.get(query_url)
             response.raise_for_status()
             results = response.json()['response']['docs']
@@ -78,6 +77,19 @@ def get_excel_values(query):
         return
 
 
-# get_best_boosts('metrics/thorough_analysis1699992951.csv')
-for i in range(len(QUERIES)):
-    print(get_excel_values(QUERIES[i]))
+def get_relevance_analysis():
+    schemas = {'v1': 'http://localhost:8984/solr/news_articles_v2/select',
+               'v2': 'http://localhost:8985/solr/news_articles_v3/select',
+               'v4': 'http://localhost:8985/solr/news_articles_v3/select',
+               'v3': 'http://localhost:8986/solr/news_articles_v4/select'}
+
+    embeddings = {'v1': False, 'v2': True, 'v3': False, 'v4': True}
+    # get_best_boosts('metrics/thorough_analysis1699992951.csv')
+    results = dict()
+    for schema in schemas.keys():
+        results[schema] = dict()
+    for query in QUERIES:
+        for schema, url in schemas.items():
+            values = get_excel_values(query, embeddings[schema], url)
+            results[schema][query['name']] = ''.join(map(str, values)).replace('1', 'R').replace('0', 'N')
+    return results

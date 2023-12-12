@@ -32,7 +32,7 @@ def thorough_analysis(title, content, **substitutes):
     return to_be_tried
 
 
-BASE_URL = 'http://localhost:8986/solr/news_articles_v4/select'
+BASE_URL = 'http://localhost:8984/solr/news_articles_v2/select'
 ROWS = 30
 
 QUERIES = [
@@ -51,7 +51,7 @@ QUERIES = [
             }
     },
     {
-        "name": "Poor refereeing performance in important matches",
+        "name": "Poor refereeing\nperformance in\nimportant matches",
         "query_name": "Má arbitragem em jogos importantes",
         "qrels_file": "qrels_files/arb.txt",
         "query": {
@@ -64,7 +64,7 @@ QUERIES = [
             }
     },
     {
-        "name": "Visiting team scoring over three goals",
+        "name": "Visiting team\nscoring over\nthree goals",
         "query_name": "Equipa visitante marca mais de 3 golos",
         "qrels_file": "qrels_files/3_goals.txt",
         "query": {
@@ -77,7 +77,7 @@ QUERIES = [
             }
     },
     {
-        "name": "Benfica performance throughout matches",
+        "name": "Benfica performance\nthroughout matches",
         "query_name": "Desempenho do Benfica ao longo dos jogos",
         "qrels_file": "qrels_files/benfica.txt",
         "query": {
