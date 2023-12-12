@@ -124,6 +124,7 @@ function openArticle(article){
                 <div class="card w-75 m-auto expanded">
                     <div class="card-body">
                         <a class="card-title">${article.title.trim()}</a>
+                        <h5 class="card-title">${article.date.substr(0, 10)}</h5>
                         <p class="card-text py-2">${article.content.trim()}</p>
                     </div>
                 </div>
@@ -212,7 +213,7 @@ function renderRelated(docs) {
         card.classList.add('card')
         document.querySelector('#relatedArticles').appendChild(card)
         card.innerHTML = `<div class="card-body">
-        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a>
+        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a><h5 class="card-title">${article.date.substr(0, 10)}</h5>
     </div>`
         card.addEventListener('click', () => {
             openArticle(article)
