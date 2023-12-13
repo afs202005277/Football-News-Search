@@ -12,7 +12,7 @@ sudo docker run --rm -p 8986:8983 --name pri-solr-v4 -v ${PWD}:/data -d solr:9.3
 docker cp ./pri_synonyms.txt pri-solr-v3:/var/solr/data/news_articles_v3/conf
 docker cp ./pri_synonyms.txt pri-solr-v4:/var/solr/data/news_articles_v4/conf
 
-sleep 5
+sleep 10
 echo "Running on port 8983:v1, 8984:v2, 8985:v3, 8986:v4"
 
 # Schema definition via API

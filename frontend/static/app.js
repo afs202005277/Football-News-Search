@@ -1,7 +1,7 @@
 let relevantDocuments = []
 let divsSeen = []
 
-function formHTML(){
+function formHTML(prev_search=""){
     return `
         <form class="w-75 m-auto d-flex justify-content-center align-items-center flex-grow-1">
             <div class="form-container w-100 d-flex justify-content-center align-items-center rounded">
@@ -49,7 +49,14 @@ function formHTML(){
                     <option value="abola">ABola</option>
                 </select>
                 <div class="sep"></div>
-                <input type="text" class="search-field flex-grow-1" placeholder="Pesquise por algo..."/>
+                <select id="sentiment" class="search-field form-select" aria-label="Sentimento">
+                    <option value="" selected>Sentimento</option>
+                    <option value="negative">Negativas</option>
+                    <option value="neutral">Neutras</option>
+                    <option value="positive">Positivas</option>
+                </select>
+                <div class="sep"></div>
+                <input type="text" class="search-field flex-grow-1" placeholder="Pesquise por algo..." value="${prev_search}"/>
                 <button type="submit" class="search-field"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg></button>
             </div>
         </form>
@@ -86,7 +93,7 @@ function loadSeeMore() {
 function openArticle(article){
     if (document.querySelector('ul')) localStorage.setItem('cachedResults', document.querySelector('ul').outerHTML)
 
-    const BACKEND_URL = 'http://localhost:5000/relatedContent/'
+    const BACKEND_URL = 'http://localhost:8000/relatedContent/'
     let doc = `${article.title} ${article.content}`
 
 
@@ -117,14 +124,20 @@ function openArticle(article){
         
     });
 
+    const icon = article.origin == 'record'
+        ? 'record.ico'
+        : article.origin == 'ojogo'
+            ? 'ojogo.png'
+            : 'abola.ico'
+
     if (document.querySelector('ul')) {
         document.querySelector('ul').outerHTML = `
             <article class="d-flex justify-content-center flex-column">
                 <a id="back"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></a>
                 <div class="card w-75 m-auto expanded">
                     <div class="card-body">
-                        <a class="card-title">${article.title.trim()}</a>
-                        <h5 class="card-title">${article.date.substr(0, 10)}</h5>
+                        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a>
+                        <h5 class="card-title">${article.date.substr(0, 10)}   |   ${renderSentiment(article.sentiment)}</h5>
                         <p class="card-text py-2">${article.content.trim()}</p>
                     </div>
                 </div>
@@ -213,7 +226,7 @@ function renderRelated(docs) {
         card.classList.add('card')
         document.querySelector('#relatedArticles').appendChild(card)
         card.innerHTML = `<div class="card-body">
-        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a><h5 class="card-title">${article.date.substr(0, 10)}</h5>
+        <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a><h5 class="card-title">${article.date.substr(0, 10)}   |   ${renderSentiment(article.sentiment)}</h5>
     </div>`
         card.addEventListener('click', () => {
             openArticle(article)
@@ -228,6 +241,16 @@ function renderCached(){
     frontendStatistic()
 }
 
+function renderSentiment(sentiment) {
+    if (sentiment > 0.25) {
+        return `<span style="color: #329d32">${Math.round(sentiment / 2 * 100)}% Positivo</span>`
+    } else if (sentiment < -0.25) {
+        return `<span style="color: #9d3232">${Math.round(-sentiment / 2 * 100)}% Negativo</span>`
+    } else {
+        return `<span style="color: #32479d">Neutro</span>`
+    }
+}
+
 function renderArticle(article){
     const icon = article.origin == 'record' 
         ? 'record.ico'
@@ -239,7 +262,7 @@ function renderArticle(article){
         <div class="card">
             <div class="card-body">
                 <a class="card-title">${article.title.trim()}<img class="origin" src="../static/${icon}"/></a>
-                <h5 class="card-title">${article.date.substr(0, 10)}</h5>
+                <h5 class="card-title">${article.date.substr(0, 10)}   |   ${renderSentiment(article.sentiment)}</h5>
                 <p class="card-text">${article.content}</p>
             </div>
         </div>
@@ -256,14 +279,14 @@ function bindArticles(){
         })
 }
 
-function renderResults(data){
+function renderResults(data, query_text){
     localStorage.setItem("data", JSON.stringify(data))
 
     document.querySelector('body').innerHTML = `
         <main>
             <div class="p-5 d-flex align-items-center align-items-center justify-content-center">
-                <img src="../static/logo.png" width="90px" alt="News Logo">
-                ${formHTML()}
+                <a href="/"><img src="../static/logo.png" width="90px" alt="News Logo"></a>
+                ${formHTML(query_text)}
             </div>
             ${data.length == 0
                 ? '<div id="noresults">Sem Resultados :(</div>'
@@ -281,31 +304,22 @@ function renderResults(data){
     frontendStatistic()
 }
 
-async function performSearch(query_text, team, origin){
-    const BACKEND_URL = 'http://localhost:5000/solr/'
+async function performSearch(query_text, team, origin, sentiment){
+    const BACKEND_URL = 'http://localhost:8000/solr/'
     var query = ""
-    if (team != "") query += `${team} `
-    if (origin != "") query += `${origin}`
+    if (team !== "") query += `${team} `
+    if (origin !== "") query += `${origin} `
     query += `${query_text}`
-
-    /*
-    var query = {
-        q: `${team ? `(title:${team}) AND ` : ''}${origin ? `(origin:${origin}) AND ` : ''}(content:${query})`,
-        rows: 10,
-        wt: "json"
-    };
-    */
 
     loading()
 
     $.ajax({
         url: BACKEND_URL,
-        data: query,
+        data: { query: query, sentiment: sentiment},
         dataType: 'json',
         headers: { method: 'GET' },
         success: function(data) {
-            console.log(data)
-            renderResults(data)
+            renderResults(data, query_text)
         },
         error: function(_) {
             renderHome()
@@ -329,12 +343,16 @@ function bindForm(){
         const origin = document.getElementById('origem')
         if(!origin) return
 
+        const sentiment = document.getElementById('sentiment')
+        if (!sentiment) return
+
         console.log('Query: ', input.value)
         console.log('Filter Equipa: ', team.value ? team.value : 'None')
         console.log('Filter Origem: ', origin.value ? origin.value : 'None')
+        console.log('Filter Sentimento: ', sentiment.value ? sentiment.value : 'None')
 
         if(input.value !== '')
-            performSearch(input.value, team.value, origin.value)
+            performSearch(input.value, team.value, origin.value, sentiment.value)
     })
 }
 
