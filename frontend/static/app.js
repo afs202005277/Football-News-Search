@@ -244,9 +244,9 @@ function renderCached(){
 
 function renderSentiment(sentiment) {
     if (sentiment > 0.25) {
-        return `<span style="color: #329d32">${Math.round(sentiment / 2 * 100)}% Positivo</span>`
+        return `<span style="color: #329d32">${Math.round(sentiment * 100)}% Positivo</span>`
     } else if (sentiment < -0.25) {
-        return `<span style="color: #9d3232">${Math.round(-sentiment / 2 * 100)}% Negativo</span>`
+        return `<span style="color: #9d3232">${Math.round(-sentiment * 100)}% Negativo</span>`
     } else {
         return `<span style="color: #32479d">Neutro</span>`
     }
