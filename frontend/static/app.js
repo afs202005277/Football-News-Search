@@ -156,6 +156,7 @@ function openArticle(article){
                 <div class="card w-75 m-auto expanded">
                     <div class="card-body">
                         <a class="card-title">${article.title.trim()}</a>
+                        <h5 class="card-title">${article.date.substr(0, 10)}   |   ${renderSentiment(article.sentiment)}</h5>
                         <p class="card-text py-2">${article.content.trim()}</p>
                     </div>
                 </div>
@@ -272,7 +273,7 @@ function renderArticle(article){
 function bindArticles(){
     const data = JSON.parse(localStorage.getItem("data"))
 
-    const articles = document.querySelectorAll('a')
+    const articles = document.querySelectorAll('a.card-title')
     for(let i = 0; i < articles.length; i++)
         articles[i].addEventListener('click', () => {
             openArticle(data[i])
@@ -281,7 +282,6 @@ function bindArticles(){
 
 function renderResults(data, query_text){
     localStorage.setItem("data", JSON.stringify(data))
-
     document.querySelector('body').innerHTML = `
         <main>
             <div class="p-5 d-flex align-items-center align-items-center justify-content-center">
