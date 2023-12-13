@@ -63,7 +63,7 @@ def get_excel_values(query, embedding, base_url):
         with open('qrels_files/temp.json', 'w', encoding='utf-8') as file:
             json.dump(results, file, ensure_ascii=False, indent=4)
         sol = []
-        for i in range(min(len(results), 60)):
+        for i in range(min(len(results), 30)):
             idx = int(results[i]['id'])
             if idx in qrels:
                 sol.append(1)

@@ -41,51 +41,41 @@ QUERIES = [
         "query_name": "Maior transferência monetária de 2019",
         "qrels_file": "qrels_files/transfer.txt",
         "query": {
-            "q": "content:\"transferencia\"\ntitle:milionaria",
-            "indent": "true",
-            "q.op": "OR",
-            'fq': 'date:[2019-01-01T00:00:00Z TO 2019-12-31T00:00:00Z]',
-            'qf': 'title^2',
-            'pf': 'content~5',
-            'rows': ROWS
-            }
+                "q": f"content:\"transferencia\"^1\ntitle:milionaria^7",
+                "q.op": "OR",
+                'fq': 'date:[2019-01-01T00:00:00Z TO 2019-12-31T00:00:00Z]',
+                'rows': 30
+                }
     },
     {
         "name": "Poor refereeing\nperformance in\nimportant matches",
         "query_name": "Má arbitragem em jogos importantes",
         "qrels_file": "qrels_files/arb.txt",
         "query": {
-            "q": "content: arbitragem erros jogo importante",
-            "indent": "true",
-            "q.op": "OR",
-            'qf': 'title^2',
-            'pf': 'content~5',
-            'rows': ROWS
-            }
+                "q": f"content: arbitragem erros jogo importante^1",
+                "q.op": "OR",
+                'rows': 30
+                }
     },
     {
         "name": "Visiting team\nscoring over\nthree goals",
         "query_name": "Equipa visitante marca mais de 3 golos",
         "qrels_file": "qrels_files/3_goals.txt",
         "query": {
-            'q': 'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
-            "indent": "true",
-            "q.op": "OR",
-            'qf': 'title^2',
-            'pf': 'content~5',
-            'rows': ROWS
-            }
+                'q': f'title: vs AND title:\\-3 \\-4 \\-5 \\-6 \\-7 \\-8 \\-9 \\-10',
+                "q.op": "OR",
+                'rows': 60
+                }
     },
     {
         "name": "Benfica performance\nthroughout matches",
         "query_name": "Desempenho do Benfica ao longo dos jogos",
         "qrels_file": "qrels_files/benfica.txt",
         "query": {
-            'q': "title:Benfica AND content:(performance OR desempenho OR rendimento)",
-            'qf': 'title^2',
-            'pf': 'content~5',
-            'rows': ROWS
-            }
+                'q': f"title:Benfica^7 AND content:performance^1 OR desempenho^1 OR rendimento^1",
+                "q.op": "OR",
+                'rows': 30
+                }
     }
 ]
 
